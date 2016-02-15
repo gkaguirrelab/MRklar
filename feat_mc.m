@@ -131,7 +131,7 @@ for rr = 1:nruns
         [~,~] = system([commandc ' &']);
     end
     % Also save this out in a file.
-    fid = fopen(fullfile(session_dir, 'feat_mc_scripts'), 'a');
+    fid = fopen(fullfile(session_dir, 'feat_mc_scripts.sh'), 'a');
     fprintf(fid, '%s\n',commandc);
     fclose(fid);
 end
