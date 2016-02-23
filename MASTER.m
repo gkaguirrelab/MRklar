@@ -88,8 +88,8 @@ create_regressors(session_dir,runNum);
 %   bold directory specified by 'runNum'
 remove_noise(session_dir,runNum);
 %% Local White Matter
-% Removes the average signal from local white matter for the bold 
-%   directory specified by 'runNum'
+% Removes the average local white matter signal in the functional volume 
+%   for the bold directory specified by 'runNum'
 remove_localWM(session_dir,runNum);
 %% Temporal filter
 % Temporally filters the bold data, based on a specified filter (see help), 
