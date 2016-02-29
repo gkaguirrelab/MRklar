@@ -1,4 +1,4 @@
-function create_preprocessing_scripts(session_dir,subject_name,outDir,logDir,job_name,numRuns,reconall,slicetiming,B0,filtType,lowHz,highHz,physio,motion,task,localWM,anat,amem,fmem)
+function create_preprocessing_scripts(session_dir,subject_name,outDir,logDir,job_name,numRuns,reconall,slicetiming,B0,filtType,lowHz,highHz,physio,motion,task,localWM,anat,amem,fmem,dbDir)
 
 % Writes shell scripts to preprocess MRI data on the UPenn cluster.
 %
@@ -40,6 +40,8 @@ function create_preprocessing_scripts(session_dir,subject_name,outDir,logDir,job
 %   anat = 1;
 %   amem = 20;
 %   fmem = 50;
+%   dbDir = '/data/jet/abock/Dropbox\ \(Aguirre-Brainard\
+%   Lab\)/MELA_data/HCLV_Photo/HERO_gka1';
 %   create_preprocessing_scripts(session_dir,subject_name,outDir,logDir,...
 %       job_name,numRuns,reconall,slicetiming,B0,filtType,lowHz,highHz,...
 %       physio,motion,task,localWM,anat,amem,fmem);
@@ -86,6 +88,9 @@ end
 if ~exist('fmem','var')
     fmem = 50;
 end
+if ~exist('dbDir','var')
+    dbDir = '';
+end
 %% Add to log
 SaveLogInfo(session_dir,mfilename,session_dir,subject_name,outDir,logDir,job_name,numRuns,reconall,slicetiming,B0,filtType,lowHz,highHz,physio,motion,task,localWM,anat,amem,fmem);
 
@@ -99,5 +104,5 @@ create_submit_functional_script(outDir,logDir,job_name,numRuns,fmem);
 % anatomical
 create_anatomical_script(session_dir,subject_name,outDir,job_name,reconall,slicetiming,B0);
 % functional
-create_functional_script(session_dir,subject_name,outDir,job_name,numRuns,filtType,lowHz,highHz,physio,motion,task,localWM,anat)
+create_functional_script(session_dir,subject_name,outDir,job_name,numRuns,filtType,lowHz,highHz,physio,motion,task,localWM,anat,dbDir);
 system(['chmod +x ' fullfile(outDir,'*')]);
