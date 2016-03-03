@@ -99,5 +99,5 @@ create_submit_functional_script(outDir,logDir,job_name,numRuns,fmem);
 % anatomical
 create_anatomical_script(session_dir,subject_name,outDir,job_name,reconall,slicetiming,B0);
 % functional
-create_functional_script(session_dir,subject_name,outDir,job_name,numRuns,filtType,lowHz,highHz,physio,motion,task,localWM,anat)
+create_functional_script(session_dir,subject_name,outDir,job_name,numRuns,filtType,lowHz,highHz,physio,motion,task,localWM,anat);
 system(['chmod +x ' fullfile(outDir,'*')]);

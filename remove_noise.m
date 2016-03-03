@@ -67,8 +67,20 @@ for rr = runNum
     else
         motion_noise = load(fullfile(session_dir,d{rr},'motion_params.txt'));
         if remove_task
+            % Get the task files
+            %   Some files have no leading zeros, so we have to clean up a bit.
+            allDirs = listdir(fullfile(session_dir,'Stimuli'),'dirs');
+            dirNums = zeros(1,length(allDirs));
+            for i = 1:length(allDirs)
+                if strcmp(allDirs{i}(end-1),'-');
+                    dirNums(i) = str2double(allDirs{i}(end));
+                else
+                    dirNums(i) = str2double(allDirs{i}(end-1:end));
+                end
+            end
+            [~,dirNums] = sort(dirNums);
+            inDir = fullfile(session_dir,'Stimuli',allDirs{dirNums(runNum)});
             % Remove task
-            bold_dir = fullfile(session_dir,d{rr});
             TR = fmri.pixdim(5)/1000;
             if TR < 0.1
                 error('TR is less than 0.1, most likely input nifti TR not in msec')
@@ -76,7 +88,8 @@ for rr = runNum
             lengthTC = size(tc,1);
             % Convert task conditions into timecoures (convolve with HRF) that
             % are at the resolution of the TR.
-            [outTC] = convert_task2tc(bold_dir,TR,lengthTC);
+            keyword = '_valid'; % only use 'valid' trials
+            [outTC] = convert_task2tc(inDir,TR,lengthTC,keyword);
             % regress out task from motion
             motion_noise = regress_task(motion_noise,outTC);
         end
