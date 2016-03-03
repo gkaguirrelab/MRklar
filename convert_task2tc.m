@@ -5,7 +5,7 @@ function [outTC] = convert_task2tc(inDir,TR,lengthTC,keyword)
 %   resolution of the timeseries in question.
 %
 %   Usage:
-%       [outTC] = convert_task2tc(dbDir,TR,lengthTC)
+%       [outTC] = convert_task2tc(inDir,TR,lengthTC,keyword)
 %
 %   Written by Andrew S Bock Oct 2015
 
