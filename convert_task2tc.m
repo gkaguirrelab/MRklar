@@ -11,22 +11,24 @@ function [outTC] = convert_task2tc(inDir,TR,lengthTC,keyword)
 
 %% set defaults
 if ~exist('keyword','var')
-    keyword = 'valid';
+    keyword = '_valid';
 end
 sampR = 1000;
 %% Find condition files with 
 f = listdir(fullfile(inDir,['*' keyword '*']),'files');
 %% Load condition files, pull out time points, convert to msec
+c = cell([1,length(f)]);
 for i = 1:length(f)
     tmp = load(fullfile(inDir,f{i}));
-    c(i,:,:) = round(tmp(:,1:2)*sampR);
+    c{i} = round(tmp(:,1:2)*sampR);
 end
 %% Create conditions (sample rate = 1 msec)
 tcLength = lengthTC*TR*sampR;
 tc = zeros(tcLength,length(f));
-for i = 1:size(c,1)
-    for j = 1:size(c,2)
-        ind = (c(i,j,1)+1):(c(i,j,1)+1 + c(i,j,2));
+for i = 1:length(c)
+    tmp = c{i};
+    for j = 1:size(tmp,1)
+        ind = tmp(j,1)+1:(tmp(j,1)+1 + tmp(j,2));
         ind(ind>tcLength) = [];
         tc(ind,i) = 1;
     end

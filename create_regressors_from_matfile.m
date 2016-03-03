@@ -1,25 +1,29 @@
-function create_regressors_from_matfile(matFile)
+function create_regressors_from_matfile(matFile,outDir,wrapAround)
 
 % Creates .txt files in the FSL 3-colium format of releveant regressors
 %   from .mat file generated from our experimental scripts
 %   (OLFlickerSensitivity).
 %
 %   Usage:
-%   create_regressors_from_matfile(matFile)
+%   create_regressors_from_matfile(matFile,outDir,wrapAround)
 %
 %   Input:
 %   matFile = full path and filename of .mat file
+%   outDir = path to output directory (e.g. fullfile(session_dir,'Stimuli'));
+%   wrapAround = 1 to remove the wrap around block, 0 otherwise
 %
 %   2/22/16   ms, gf      Written.
 %   Updates by Andrew S Bock Feb 2016
+%   3/1/16 wrap-around update gf
+%   Wrap Around fix by Andrew S Bock Mar 2016
 
 %% Load the data, create output directory
 load(matFile);
 % Output prefix
-[fileDir, fileName] = fileparts(matFile);
+[~, fileName] = fileparts(matFile);
 NSegments = length(params.responseStruct.events);
 % Make a 'covariates' folder
-covDir = fullfile(fileDir,fileName);
+covDir = fullfile(outDir,fileName);
 if ~exist(covDir,'dir');
     mkdir(covDir);
 end
@@ -75,7 +79,6 @@ for f = 1:length(theFreqs)
     allTrials       = params.theFrequencyIndices == f;
     validTrials     = params.theFrequencyIndices == f & ~miss;
     invalidTrials   = params.theFrequencyIndices == f & miss;
-    
     % Construct the 'all' covariate
     startTrials = [params.responseStruct.events(allTrials).tTrialStart] ...
         - params.responseStruct.tBlockStart;
@@ -90,7 +93,6 @@ for f = 1:length(theFreqs)
     dlmwrite(fullfile(covDir, ...
         [fileName '-cov_' num2str(theFreqs(f)) 'Hz_all.txt']), allCov, '\t');
     fprintf('done.\n');
-    
     % Construct the 'valid' covariate
     startTrials = [params.responseStruct.events(validTrials).tTrialStart] ...
         - params.responseStruct.tBlockStart;
@@ -105,7 +107,6 @@ for f = 1:length(theFreqs)
     dlmwrite(fullfile(covDir, ...
         [fileName '-cov_' num2str(theFreqs(f)) 'Hz_valid.txt']), validCov, '\t');
     fprintf('done.\n');
-    
     % Construct the 'invalid' covariate
     startTrials = [params.responseStruct.events(invalidTrials).tTrialStart] ...
         - params.responseStruct.tBlockStart;
@@ -139,3 +140,27 @@ for i = 1:NSegments
     end
 end
 dlmwrite(fullfile(covDir, [fileName '-cov_attentionTask.txt']), attCov, '\t');
+%% Save wrap around as separate covariate
+if wrapAround
+    % The first presented frequency is the wrap around
+    wrap_freq = theFreqs(params.theFrequencyIndices(1));
+    %remove wrap-around block from 'all' covariate
+    oldAll = load(fullfile(covDir,[fileName '-cov_' num2str(wrap_freq) 'Hz_all.txt']));
+    dlmwrite(fullfile(covDir, ...
+        [fileName '-cov_' num2str(wrap_freq) 'Hz_all.txt']), oldAll(2:end,:), '\t');
+    dlmwrite(fullfile(covDir, ...
+        [fileName '-cov_' num2str(wrap_freq) 'Hz_wrapAround.txt']), oldAll(1,:), '\t');
+    %remove wrap-around block from 'valid' covariate
+    oldValid = load(fullfile(covDir,[fileName '-cov_' num2str(wrap_freq) 'Hz_valid.txt']));
+    if ismember(oldValid(1,:),oldAll(1,:),'rows');
+        dlmwrite(fullfile(covDir, ...
+            [fileName '-cov_' num2str(wrap_freq) 'Hz_valid.txt']), oldValid(2:end,:), '\t');
+    end
+    %remove wrap-around block from 'invalid' covariate
+    oldInvalid = load(fullfile(covDir,[fileName '-cov_' num2str(wrap_freq) 'Hz_invalid.txt']));
+    if ismember(oldInvalid(1,:),oldAll(1,:),'rows');
+        dlmwrite(fullfile(covDir, ...
+            [fileName '-cov_' num2str(wrap_freq) 'Hz_invalid.txt']), oldInvalid(2:end,:), '\t');
+    end
+    disp('Wrap around block saved as covariate');
+end

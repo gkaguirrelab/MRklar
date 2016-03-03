@@ -1,4 +1,4 @@
-function remove_noise(session_dir,runNum,func,remove_task,anat,motion,physio,dbDir)
+function remove_noise(session_dir,runNum,func,remove_task,anat,motion,physio)
 % Removes physiological and other non-neuronal noise.
 %
 %   Usage:
@@ -68,10 +68,8 @@ for rr = runNum
         motion_noise = load(fullfile(session_dir,d{rr},'motion_params.txt'));
         if remove_task
             % Get the task files
-            %   There are no leading zeros in the stimulus scripts, 
-            %   apparently it's an issue with something in Psychtoolbox, so 
-            %   we have to clean up a bit.
-            allDirs = listdir(dbDir,'dirs');
+            %   Some files have no leading zeros, so we have to clean up a bit.
+            allDirs = listdir(fullfile(session_dir,'Stimuli'),'dirs');
             dirNums = zeros(1,length(allDirs));
             for i = 1:length(allDirs)
                 if strcmp(allDirs{i}(end-1),'-');
@@ -81,7 +79,7 @@ for rr = runNum
                 end
             end
             [~,dirNums] = sort(dirNums);
-            inDir = fullfile(dbDir,allDirs(dirNums(runNum)));
+            inDir = fullfile(session_dir,'Stimuli',allDirs{dirNums(runNum)});
             % Remove task
             TR = fmri.pixdim(5)/1000;
             if TR < 0.1
@@ -90,7 +88,7 @@ for rr = runNum
             lengthTC = size(tc,1);
             % Convert task conditions into timecoures (convolve with HRF) that
             % are at the resolution of the TR.
-            keyword = 'valid'; % only use 'valid' trials
+            keyword = '_valid'; % only use 'valid' trials
             [outTC] = convert_task2tc(inDir,TR,lengthTC,keyword);
             % regress out task from motion
             motion_noise = regress_task(motion_noise,outTC);
