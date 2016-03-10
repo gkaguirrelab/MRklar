@@ -30,8 +30,34 @@ if ~exist(covDir,'dir');
 end
 
 switch protocolName
-    case 'Melanopsin'
-        % Create delta regressors here.
+    case 'MelanopsinHRF'
+        %% Create delta regressors
+        % Iterate over each segment, extract the onset and add to the
+        % regressor matrix
+        NSegments = 28;
+        deltaDurSec = 0.2;
+        regressorDurations = repmat(deltaDurSec, NSegments, 1);
+        regressorValues = ones(NSegments, 1);
+        
+        phaseOffsetSec = params.thePhaseOffsetSec(params.thePhaseIndices);
+        phaseOffsetSec = zeros(1, NSegments);
+        
+        NIntervals = 14; % 14 intervals after stimulus onset
+        theIntervals = 0:13;
+        for ii = 1:NIntervals
+            % Define the regressor name
+            regressorFileName = [fileName '-cov_delta_' num2str(theIntervals(ii), '%02.f') 'Sec_valid.txt'];
+            for jj = 1:NSegments
+                % Extract the time of stimulus onset.
+                t0(jj) = params.responseStruct.events(jj).tTrialStart+phaseOffsetSec(jj)-params.responseStruct.tBlockStart;
+            end
+            % Define onset of the regressor
+            regressorOnsets = t0 + theIntervals(ii)
+            % Assemble into one matrix
+            deltaCov = [regressorOnsets' regressorDurations regressorValues];
+            dlmwrite(fullfile(covDir, regressorFileName), deltaCov, '\t');
+        end
+        
     case 'HCLV_Photo'
         %% Iterate over the segments and count analyze accuracy
         attentionTaskFlag   = zeros(1,NSegments);
