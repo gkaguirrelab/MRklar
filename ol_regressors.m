@@ -1,11 +1,11 @@
-function create_regressors_from_matfile(matFile,outDir,protocolName,wrapAround)
+function ol_regressors(matFile,outDir,protocolName,wrapAround)
 
 % Creates .txt files in the FSL 3-colium format of releveant regressors
 %   from .mat file generated from our experimental scripts
 %   (OLFlickerSensitivity).
 %
 %   Usage:
-%   create_regressors_from_matfile(matFile,outDir,protocolName,wrapAround)
+%   ol_regressors(matFile,outDir,protocolName,wrapAround)
 %
 %   Input:
 %   matFile = full path and filename of .mat file
