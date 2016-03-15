@@ -3,16 +3,16 @@ function create_preprocessing_scripts(session_dir,subject_name,outDir,logDir,job
 % Writes shell scripts to preprocess MRI data on the UPenn cluster.
 %
 %   Usage:
-%   create_preprocessing_scripts(session_dir,subject_name,outDir,logDir,job_name,numRuns,reconall,B0,physio,motion,task,localWM,anat,acores,amem,fcores,fmem)
+%   create_preprocessing_scripts(session_dir,subject_name,outDir,logDir,job_name,numRuns,reconall,slicetiming,B0,filtType,lowHz,highHz,physio,motion,task,localWM,anat,amem,fmem)
 %
 %   Defaults:
 %   reconall = 0; run recon-all (default - off)
 %   slicetiming = 1; correct slice timings
 %   B0 = 0; B0 unwarping (default - off)
 %   filtType = 'high'; highpass filter
-%   physio = 0; physiological noise removal from pulseOx (default - off)
 %   lowHz = 0.01; % note - only applies when filtType = 'high' or 'band'
 %   highHz = 0.10; % note - only applies when filtType = 'low' or 'band'
+%   physio = 0; physiological noise removal from pulseOx (default - off)
 %   motion = 1; noise removal from motion
 %   task = 0; orthogonalization to task regressors (default - off)
 %   localWM = 1; removal of noise derived from local white matter (default - on)
