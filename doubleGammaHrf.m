@@ -47,7 +47,7 @@ end
 dx = TR:TR:len;
 A = [0 gampdf(dx,tp(1),beta(1))];
 B = [0 gampdf(dx,tp(2),beta(2))];
-hrf = A/max(A) - rt*B/max(B);
+hrf = A - rt*B;
 hrf = hrf'/sum(hrf);
 %%
 %hrf = hrf(1:floor(len/TR))/sum(hrf(1:floor(len/TR)));
