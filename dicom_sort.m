@@ -1,7 +1,14 @@
-function [] = dicom_sort(dicomDir)
+function dicom_sort(dicomDir)
+% Creates several directories within the <dicomDir>, based on the
+%  protocol name and series found in the dicom headers.  Individual dicoms
+%  are moved from the dicomDir into their respective protocol and series
+%  directory.
 %
+%   Usage:
+%   dicom_sort(dicomDir)
+%   
 % Input:
-%   -dicomDir = full path to dicom directory, with all dicoms from
+%   dicomDir = full path to dicom directory, with all dicoms from
 %   different acquisition series in the same directory. Assumes <dicomDir>
 %   contains only dicom files.
 %
@@ -16,6 +23,7 @@ function [] = dicom_sort(dicomDir)
 %
 % Written by Andrew S Bock Feb 2014
 
+%%
 cur = cd; % save current directory
 cd(dicomDir);
 % check if '.dcm' has been removed
