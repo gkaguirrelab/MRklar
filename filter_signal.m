@@ -37,4 +37,12 @@ switch filtType
         Wn = [cutoffHzlow cutoffHzhigh]./f_cutoff;
         FD = design(fdesign.bandpass('N,F3dB1,F3dB2',n,Wn(1),Wn(2)),'butter');
         outSignal = filtfilt(FD.sosMatrix, FD.ScaleValues, inSignal);
+    case 'notch'
+        disp('FiltType = ''notch''');
+        f_cutoff  = 1/(2*sampT);
+        n = 4; %requires even order number
+        q = 30; % Quality factor. Higher = narrow
+        f0 = cutoffHzhigh/f_cutoff;        
+        FD = design(fdesign.notch(n,f0,q));
+        outSignal = filtfilt(FD.sosMatrix, FD.ScaleValues, inSignal);
 end
