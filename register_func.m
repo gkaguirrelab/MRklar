@@ -1,17 +1,17 @@
-function register_feat(session_dir,subject_name,runNum,despike,func)
+function register_func(session_dir,subject_name,runNum,despike,func)
 
-% Registers functional runs in feat directories to freesurfer anatomical,
-%   following feat_mc. 
+% Registers functional runs in to freesurfer anatomical, following
+% 'motion_slice_correction'
 %
 % Usage:
-%   register_feat(session_dir,subject_name,runNum,despike,func)
+%   register_func(session_dir,subject_name,runNum,despike,func)
 %
 % Defaults:
 %   despike = 1; % despike data
-%   func = 'brf'
+%   func = 'rf'
 %
 % Outputs (in each bold directory):
-%   bbreg.dat - registration text file
+%   func_bbreg.dat - registration text file
 % if despike
 %   <func>_spikes.mat - cell matrix, non-empty cells contain the location
 %   of spikes in "filtered_func_data.nii.gz"
@@ -19,8 +19,6 @@ function register_feat(session_dir,subject_name,runNum,despike,func)
 %   the location of spikes in "filtered_func_data.nii.gz"
 %
 %   Written by Andrew S Bock Dec 2014
-%
-% 12/15/14      spitschan       Added case of BOLD runs called 'RUN_'
 
 %% Set default parameters
 if ~exist('despike','var')
@@ -29,7 +27,6 @@ end
 if ~exist('func','var')
     func = 'rf'; % functional data file
 end
-feat_dir = [func '.feat']; % feat directory
 %% Find bold run directories
 d = find_bold(session_dir);
 nruns = length(d);
@@ -43,11 +40,8 @@ end
 for rr = runNum
     if despike
         disp('Despiking filtered functional data');
-        remove_spikes(fullfile(session_dir,d{rr},feat_dir,'filtered_func_data.nii.gz'),...
+        remove_spikes(fullfile(session_dir,d{rr},[func '.nii.gz']),...
             fullfile(session_dir,d{rr},[func '.nii.gz']),fullfile(session_dir,d{rr},[func '_spikes']));
-    else
-        copyfile(fullfile(session_dir,d{rr},feat_dir,'filtered_func_data.nii.gz'),...
-            fullfile(session_dir,d{rr},[func '.nii.gz']));
     end
 end
 %% Register functional to freesurfer anatomical

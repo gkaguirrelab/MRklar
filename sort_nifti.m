@@ -20,9 +20,6 @@ function sort_nifti(session_dir,dicom_dir)
 if ~exist('dicom_dir','var')
     dicom_dir = fullfile(session_dir,'DICOMS');
 end
-%% Add to log
-SaveLogInfo(session_dir, mfilename,session_dir,dicom_dir)
-
 %% sort dicoms within this directory
 dicom_sort(dicom_dir);
 series = listdir(dicom_dir,'dirs');

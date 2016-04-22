@@ -60,7 +60,7 @@ if ~exist('anat','var')
     anat = 1;
 end
 if ~exist('parfile','var')
-    parfile = [func '_all_motion_params.par'];
+    parfile = [func '.nii.gz.par'];
 end
 if ~exist('dtmotion','var')
     dtmotion = 1; % detrend motion params
@@ -79,17 +79,11 @@ end
 if ~exist('PCAmaxNcomp','var')
     PCAmaxNcomp = 5;
 end
-feat_dir = [func '.feat']; % feat directory
 %% Find bold run directories
 d = find_bold(session_dir);
 
 %% Create regressors
 for rr = runNum;
-    %% copy over the motion correction parameters
-    copyfile(fullfile(session_dir,d{rr},feat_dir,'mc','prefiltered_func_data_mcf.par'),...
-        fullfile(session_dir,d{rr},[func '_all_motion_params.par']));
-    copyfile(fullfile(session_dir,d{rr},feat_dir,'mc','prefiltered_func_data_mcf_abs.rms'),...
-        fullfile(session_dir,d{rr},[func '_absolute_motion_params.par']));
     %% Create Noise Regressors
     disp(['Creating Nuisance Regressors: Run ' num2str(rr)]);
     %% Create physiological noise regressors

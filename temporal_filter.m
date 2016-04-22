@@ -34,7 +34,7 @@ if ~exist('session_dir','var')
     error('"session_dir" not defined')
 end
 if ~exist('func','var')
-    func = 'rf'; % functional data file
+    func = 'wdrf'; % functional data file
 end
 if ~exist('filtType','var')
     filtType = 'detrend'; %'bptf'

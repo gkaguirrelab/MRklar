@@ -26,9 +26,6 @@ end
 if ~exist('SUBJECTS_DIR','var')
     SUBJECTS_DIR = getenv('SUBJECTS_DIR');
 end
-%% Add to log
-SaveLogInfo(session_dir, mfilename,session_dir,subject_name,SUBJECTS_DIR);
-
 %% Segment GM
 disp(['session_dir = ' session_dir]);
 disp(['subject = ' subject_name]);

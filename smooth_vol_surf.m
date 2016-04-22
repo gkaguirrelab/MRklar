@@ -23,7 +23,7 @@ if ~exist('FWHMs','var')
     FWHMs = 5;
 end
 if ~exist('func','var')
-    func = 'dbrf.tf';
+    func = 'wdrf.tf';
 end
 if ~exist('ROI','var')
     ROI = {'surface' 'volume'};
@@ -37,9 +37,6 @@ d = find_bold(session_dir);
 if ~exist('runNum','var')
     runNum = 1:length(d);
 end
-%% Add to log
-SaveLogInfo(session_dir,mfilename,session_dir,runNum,FWHMs,func,ROI,hemi)
-
 %% Smooth in volume and on surface
 for rr = runNum
     cd(fullfile(session_dir,d{rr}));

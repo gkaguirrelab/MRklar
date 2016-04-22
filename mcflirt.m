@@ -14,5 +14,6 @@ function mcflirt(inFile,outFile,refvol)
 if ~exist('refvol','var')
     refvol = 1; % 1st TR
 end
+%% Correction motion
 system(['mcflirt -in ' inFile ' -out ' outFile ' -refvol ' num2str(refvol-1) ...
-    ' -stats -mats -plots -report']);
+    ' -stats -mats -plots -report -rmsrel -rmsabs']);
