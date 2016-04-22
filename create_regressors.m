@@ -30,10 +30,7 @@ function create_regressors(session_dir,runNum,func,filtType,lowHz,highHz,physio,
 %         'unknown' ...
 %         }; % for use with anatomical ROIs
 %
-%   NOTE:
-%   output motion regressors are scaled by 100 (for motion) and
-%   1000 (for motion^2), to avoid possible issues with any
-%   subsequent regression.
+%   Motion regressors following Friston et al. (1996) (Friston 24-parameter model);
 %
 %   Written by Andrew S Bock Oct 2014
 
