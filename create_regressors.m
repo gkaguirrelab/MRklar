@@ -141,15 +141,6 @@ for rr = runNum;
         % Convert radians to mm (assume 50mm radius) (see Power et al.
         % (2012) NeuroImage, 59, 2142 - 2154)
         tmpm(:,1:3) = 50*tmpm(:,1:3);
-        % Filter the Nyquist frequency
-        tmp = load_nifti(fullfile(outDir,[func '.nii.gz']));
-        TR = tmp.pixdim(5)/1000;
-        inSignal = tmpm;
-        filtType = 'low';
-        sampT = TR;
-        cutoffHzlow = -inf;
-        cutoffHzhigh = 1/(4*TR); % Twice the Nyquist frequency
-        [tmpm] = filter_signal(inSignal,filtType,sampT,cutoffHzlow,cutoffHzhigh);
         % Create the 6 motion parameters one time point before
         tmpm_1 = [zeros(size(tmpm(1,:)));tmpm(1:end-1,:)];
         % Combine motion parameters, and the corresponding squared values
