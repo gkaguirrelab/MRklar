@@ -1,9 +1,9 @@
-function create_preprocessing_scripts(session_dir,subject_name,outDir,logDir,job_name,numRuns,reconall,slicetiming,B0,filtType,lowHz,highHz,physio,motion,task,localWM,anat,amem,fmem)
+function create_preprocessing_scripts(session_dir,subject_name,outDir,logDir,job_name,numRuns,reconall,slicetiming,refvol,filtType,lowHz,highHz,physio,motion,task,localWM,anat,amem,fmem)
 
 % Writes shell scripts to preprocess MRI data on the UPenn cluster.
 %
 %   Usage:
-%   create_preprocessing_scripts(session_dir,subject_name,outDir,logDir,job_name,numRuns,reconall,slicetiming,B0,filtType,lowHz,highHz,physio,motion,task,localWM,anat,amem,fmem)
+%   create_preprocessing_scripts(session_dir,subject_name,outDir,logDir,job_name,numRuns,reconall,slicetiming,refvol,filtType,lowHz,highHz,physio,motion,task,localWM,anat,amem,fmem)
 %
 %   Defaults:
 %   reconall = 0; run recon-all (default - off)
@@ -29,7 +29,7 @@ function create_preprocessing_scripts(session_dir,subject_name,outDir,logDir,job
 %   numRuns = 22; % number of bold runs
 %   reconall = 0;
 %   slicetiming = 1; % correct slice timings
-%   B0 = 0;
+%   refvol = 1; % motion correct to 1st TR
 %   filtType = 'high';
 %   lowHz = 0.01;
 %   highHz = 0.10;
@@ -53,8 +53,8 @@ end
 if ~exist('slicetiming','var')
     slicetiming = 1;
 end
-if ~exist('B0','var')
-    B0 = 0;
+if ~exist('refvol','var')
+    refvol = 1;
 end
 if ~exist('filtType','var')
     filtType = 'high';
@@ -87,7 +87,7 @@ if ~exist('fmem','var')
     fmem = 50;
 end
 %% Add to log
-SaveLogInfo(session_dir,mfilename,session_dir,subject_name,outDir,logDir,job_name,numRuns,reconall,slicetiming,B0,filtType,lowHz,highHz,physio,motion,task,localWM,anat,amem,fmem);
+SaveLogInfo(session_dir,mfilename,session_dir,subject_name,outDir,logDir,job_name,numRuns,reconall,slicetiming,refvol,filtType,lowHz,highHz,physio,motion,task,localWM,anat,amem,fmem);
 
 %% Create submit scripts
 if ~exist('outDir','dir')
@@ -97,7 +97,7 @@ create_submit_anatomical_script(outDir,logDir,job_name,amem);
 create_submit_functional_script(outDir,logDir,job_name,numRuns,fmem);
 %% Create job scripts
 % anatomical
-create_anatomical_script(session_dir,subject_name,outDir,job_name,reconall,slicetiming,B0);
+create_anatomical_script(session_dir,subject_name,outDir,job_name,reconall,slicetiming,refvol);
 % functional
 create_functional_script(session_dir,subject_name,outDir,job_name,numRuns,filtType,lowHz,highHz,physio,motion,task,localWM,anat);
 system(['chmod +x ' fullfile(outDir,'*')]);

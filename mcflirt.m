@@ -5,11 +5,14 @@ function mcflirt(inFile,outFile,refvol)
 %   Usage:
 %   mcflirt(inFile,outFile,refvol)
 %
+%   Note:
+%   refvol = reference TR (1 = 1st TR)
+%
 %   Written by Andrew S Bock Apr 2016
 
 %% Set defaults
 if ~exist('refvol','var')
-    refvol = 0; % 1st TR
+    refvol = 1; % 1st TR
 end
-system(['mcflirt -in ' inFile ' -out ' outFile ' -refvol ' num2str(refvol) ...
+system(['mcflirt -in ' inFile ' -out ' outFile ' -refvol ' num2str(refvol-1) ...
     ' -stats -mats -plots -report']);
