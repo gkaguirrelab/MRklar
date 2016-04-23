@@ -23,7 +23,7 @@ if ~exist('SliceTiming','var')
     SliceTiming = 1; % do slice timing correction
 end
 if ~exist('refvol','var')
-    refvol = 1; % do slice timing correction
+    refvol = 1; % reference volume = 1st TR
 end
 %% Find bold run directories
 d = find_bold(session_dir);
