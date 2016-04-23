@@ -1,7 +1,6 @@
 function create_functional_script(session_dir,subject_name,outDir,job_name,numRuns,filtType,lowHz,highHz,physio,motion,task,localWM,anat)
 
-% Writes shell script to preprocess functional MRI data on the UPenn
-% cluster.
+% Writes shell script to preprocess functional MRI data 
 %
 %   Usage:
 %   create_functional_script(session_dir,subject_name,outDir,job_name,numRuns,filtType,lowHz,highHz,physio,motion,task,localWM,anat)

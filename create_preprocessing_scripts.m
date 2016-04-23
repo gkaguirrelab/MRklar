@@ -95,9 +95,14 @@ if ~exist('outDir','dir')
 end
 create_submit_anatomical_script(outDir,logDir,job_name,amem);
 create_submit_functional_script(outDir,logDir,job_name,numRuns,fmem);
+create_submit_all_script(outDir,logDir,job_name,fmem)
 %% Create job scripts
 % anatomical
 create_anatomical_script(session_dir,subject_name,outDir,job_name,reconall,slicetiming,refvol);
 % functional
 create_functional_script(session_dir,subject_name,outDir,job_name,numRuns,filtType,lowHz,highHz,physio,motion,task,localWM,anat);
+% both anatomical and functional (i.e. 'all')
+create_all_script(session_dir,subject_name,outDir,job_name,reconall,slicetiming,refvol,numRuns,filtType,lowHz,highHz,physio,motion,...
+    task,localWM,anat);
+% Make executable
 system(['chmod +x ' fullfile(outDir,'*')]);

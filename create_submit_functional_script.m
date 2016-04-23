@@ -4,7 +4,7 @@ function create_submit_functional_script(outDir,logDir,job_name,numRuns,mem)
 % cluster.
 %
 %   Usage:
-%   create_submit_functional_script(outDir,logDir,job_name,numRuns,cores,mem)
+%   create_submit_functional_script(outDir,logDir,job_name,numRuns,mem)
 %
 %   Written by Andrew S Bock Nov 2015
 
@@ -23,6 +23,6 @@ for rr = 1:numRuns
     end
     fprintf(fid,['qsub -l h_vmem=' num2str(mem) ...
         '.2G,s_vmem=' num2str(mem) 'G -e ' logDir ' -o ' logDir ' ' ...
-        job_name '_functional_' runtext '.sh\n']);
+        fullfile(outDir,[job_name '_functional_' runtext '.sh']) '\n']);
 end
 fclose(fid);
