@@ -35,23 +35,21 @@ switch protocolName
         %% Create delta regressors
         % Iterate over each segment, extract the onset and add to the
         % regressor matrix
-        MODEL_HRF = false; % We keep this in here for now and will return to it for later analyses.
+        MODEL_HRF = true; % We keep this in here for now and will return to it for later analyses.
+        
+        % Extract information about each trial
+        contrastScalars = params.theContrastsPct(params.theContrastRelMaxIndices);
+        for ii = 1:NSegments
+            allDurSecs(ii) = params.responseStruct.events(ii).describe.params.stepTimeSec + 2*params.responseStruct.events(ii).describe.params.cosineWindowDurationSecs;
+            allDirectionLabels{ii} = params.responseStruct.events(ii).describe.direction;
+            maxContrast(ii) = params.responseStruct.events(ii).describe.params.maxContrast;
+            allContrasts(ii) = params.responseStruct.events(ii).describe.params.maxContrast * contrastScalars(ii);
+        end
+        uniqueDirections = unique(params.theDirections);
+        uniqueContrasts = unique(params.theContrastRelMaxIndices);
+        phaseOffsetSec = params.thePhaseOffsetSec(params.thePhaseIndices);
         
         if ~MODEL_HRF
-            NSegments = params.nTrials;
-            uniqueDirections = unique(params.theDirections);
-            uniqueContrasts = unique(params.theContrastRelMaxIndices);
-            phaseOffsetSec = params.thePhaseOffsetSec(params.thePhaseIndices);
-            
-            % Extract information about each trial
-            contrastScalars = params.theContrastsPct(params.theContrastRelMaxIndices);
-            for ii = 1:NSegments
-                allDurSecs(ii) = params.responseStruct.events(ii).describe.params.stepTimeSec + 2*params.responseStruct.events(ii).describe.params.cosineWindowDurationSecs;
-                allDirectionLabels{ii} = params.responseStruct.events(ii).describe.direction;
-                maxContrast(ii) = params.responseStruct.events(ii).describe.params.maxContrast;
-                allContrasts(ii) = params.responseStruct.events(ii).describe.params.maxContrast * contrastScalars(ii);
-            end
-            
             % Iterate over directions and contrasts
             for ii = 1:length(uniqueDirections)
                 for jj = 1:length(uniqueContrasts)
@@ -69,30 +67,42 @@ switch protocolName
                     fprintf('done.\n');
                 end
             end
-
+            
         else
             % Create regressors to model the HRF
-            NSegments = params.nTrials;
             deltaDurSec = 1;
-            regressorDurations = deltaDurSec*ones(NSegments, 1);
-            regressorValues = ones(NSegments, 1);
             
             phaseOffsetSec = params.thePhaseOffsetSec(params.thePhaseIndices);
             
             NIntervals = 14; % 14 intervals after stimulus onset
             theIntervals = 0:13;
-            for ii = 1:NIntervals
-                % Define the regressor name
-                regressorFileName = [fileName '-cov_delta_' num2str(theIntervals(ii), '%02.f') 'Sec_valid.txt'];
-                for jj = 1:NSegments
-                    % Extract the time of stimulus onset.
-                    t0(jj) = params.responseStruct.events(jj).tTrialStart+phaseOffsetSec(jj)-params.responseStruct.tBlockStart;
+            
+            for cc = 1:length(uniqueContrasts)
+                for dd = 1:length(uniqueDirections)
+                    thisIdx = find((params.theDirections == uniqueDirections(dd)) & (params.theContrastRelMaxIndices == uniqueContrasts(cc)));
+                    if ~isempty(thisIdx)
+                        clear t0;
+                        theContrast = max(allContrasts(thisIdx)); % Get the contrast
+                        theRelevantSegments = thisIdx;
+                        NRelevantSegments = length(theRelevantSegments);
+                        directionLabel = unique({allDirectionLabels{theRelevantSegments}}); % Get the direction label
+                        regressorDurations = deltaDurSec*ones(NRelevantSegments, 1);
+                        regressorValues = ones(NRelevantSegments, 1);
+                        for ii = 1:NIntervals
+                            % Define the regressor name
+                            regressorFileName = [fileName '-cov_' directionLabel{1} '_' num2str(100*theContrast) 'Pct_delta_' num2str(theIntervals(ii), '%02.f') 'Sec_valid.txt'];
+                            for jj = 1:NRelevantSegments
+                                % Extract the time of stimulus onset.
+                                t0(jj) = params.responseStruct.events(theRelevantSegments(jj)).tTrialStart+phaseOffsetSec(theRelevantSegments(jj))-params.responseStruct.tBlockStart;
+                            end
+                            % Define onset of the regressor
+                            regressorOnsets = t0 + theIntervals(ii);
+                            % Assemble into one matrix
+                            deltaCov = [regressorOnsets' regressorDurations regressorValues];
+                            dlmwrite(fullfile(covDir, regressorFileName), deltaCov, '\t');
+                        end
+                    end
                 end
-                % Define onset of the regressor
-                regressorOnsets = t0 + theIntervals(ii);
-                % Assemble into one matrix
-                deltaCov = [regressorOnsets' regressorDurations regressorValues];
-                dlmwrite(fullfile(covDir, regressorFileName), deltaCov, '\t');
             end
         end
         
