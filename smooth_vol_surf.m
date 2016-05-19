@@ -1,4 +1,4 @@
-function smooth_vol_surf(session_dir,runNum,FWHMs,func,ROI,hemi)
+function smooth_vol_surf(session_dir,runNum,FWHMs,func,ROI,hemis)
 
 % Smooths the volume and surface files for the specified run
 %
@@ -29,7 +29,7 @@ if ~exist('ROI','var')
     ROI = {'surface' 'volume'};
 end
 if ~exist('hemi','var');
-    hemi = {'lh' 'rh'};
+    hemis = {'lh' 'rh'};
 end
 %% Find the bold run directories
 d = find_bold(session_dir);
@@ -43,32 +43,46 @@ for rr = runNum
     regfile = listdir(fullfile(session_dir,d{rr},'*_bbreg.dat'),'files');
     bbreg_out_file = fullfile(session_dir,d{rr},regfile{1}); % name registration file
     for ro = 1:length(ROI)
-        for i = 1:length(FWHMs)
-            FWHM = FWHMs(i);
-            if strcmp(ROI{ro},'surface')
-                % Smooth on surface
-                for h = 1:length(hemi)
-                    disp(['Smoothing ' hemi{h} ' surface of ' ...
-                        fullfile(session_dir,d{rr},[func '.nii.gz'])]);
-                    inname = fullfile(session_dir,d{rr},[func '.nii.gz']);
-                    outname = fullfile(session_dir,d{rr},['s' num2str(FWHM) ...
-                        '.' func '.surf.' hemi{h} '.nii.gz']);
-                    [~,~] = system(['mri_vol2surf --src ' inname ...
-                        ' --reg ' bbreg_out_file ' --hemi ' hemi{h} ...
-                        ' --surf-fwhm ' num2str(FWHM) ' --out ' outname ...
-                        ' --projfrac-avg 0 1 0.1']);
+        if strcmp(ROI{ro},'surface')
+            % Project the unsmoothed
+            for hh = 1:length(hemis)
+                disp(['Projecting ' hemis{hh} ' surface of ' ...
+                    fullfile(session_dir,d{rr},[func '.nii.gz'])]);
+                inname = fullfile(session_dir,d{rr},[func '.nii.gz']);
+                outname = fullfile(session_dir,d{rr},[func '.surf.' hemis{hh} '.nii.gz']);
+                system(['mri_vol2surf --src ' inname ...
+                    ' --reg ' bbreg_out_file ' --hemi ' hemis{hh} ...
+                    ' --out ' outname ' --projfrac-avg 0 1 0.1']);
+            end
+            % Smooth on surface
+            if ~isempty(FWHMs)
+                for i = 1:length(FWHMs)
+                    FWHM = FWHMs(i);
+                    for hh = 1:length(hemis)
+                        disp(['Smoothing ' hemis{hh} ' surface of ' ...
+                            fullfile(session_dir,d{rr},[func '.nii.gz'])]);
+                        inname = fullfile(session_dir,d{rr},[func '.nii.gz']);
+                        outname = fullfile(session_dir,d{rr},['s' num2str(FWHM) ...
+                            '.' func '.surf.' hemis{hh} '.nii.gz']);
+                        system(['mri_vol2surf --src ' inname ...
+                            ' --reg ' bbreg_out_file ' --hemi ' hemis{hh} ...
+                            ' --surf-fwhm ' num2str(FWHM) ' --out ' outname ...
+                            ' --projfrac-avg 0 1 0.1']);
+                    end
                 end
-            elseif strcmp(ROI{ro},'volume')
-                % Smooth in volume
+            end
+        elseif strcmp(ROI{ro},'volume')
+            % Smooth in volume
+            for i = 1:length(FWHMs)
+                FWHM = FWHMs(i);
                 FWHM2sigma = FWHM / (2*sqrt(2*log(2)));
                 disp(['Smoothing volume of ' ...
                     fullfile(session_dir,d{rr},[func '.nii.gz'])]);
                 inname = fullfile(session_dir,d{rr},[func '.nii.gz']);
                 outname = fullfile(session_dir,d{rr},['s' num2str(FWHM) ...
                     '.' func '.nii.gz']);
-                [~,~] = system(['fslmaths ' inname ' -s ' num2str(FWHM2sigma) ' ' outname]);
+                system(['fslmaths ' inname ' -s ' num2str(FWHM2sigma) ' ' outname]);
             end
         end
     end
-    disp('done.');
 end
