@@ -22,9 +22,9 @@ progBar = ProgressBar(length(inVols),'mri_robust_registering...');
 for i = 1:length(inVols)
     inFile = fullfile(outDir,inVols{i});
     dstFile = fullfile(outDir,inVols{1}); % register to first volume
-    outFile = fullfile(outDir,['tmp_' num2str(i) '.nii.gz']);
+    outFile = fullfile(outDir,sprintf('tmp_%04d.nii.gz',i));
     [~,~] = system(['mri_robust_register --mov ' inFile ...
-        ' --dst ' dstFile ' --lta ' num2str(i) '.lta --satit --mapmov ' ...
+        ' --dst ' dstFile ' --lta ' sprintf('%04d.lta',i) ' --vox2vox --satit --mapmov ' ...
         outFile]);
     progBar(i);
 end
@@ -32,7 +32,7 @@ system(['rm ' fullfile(outDir,'split_f0*')]); % remove split volumes
 %% Merge into output 4D volume
 commandc = ['fslmerge -t ' outVol];
 for i = 1:length(inVols)
-    outFile = fullfile(outDir,['tmp_' num2str(i) '.nii.gz']);
+    outFile = fullfile(outDir,sprintf('tmp_%04d.nii.gz',i));
     commandc = [commandc ' ' outFile];
 end
 system(commandc);
