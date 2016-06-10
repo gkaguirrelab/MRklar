@@ -1,26 +1,23 @@
-function motion_slice_correction(session_dir,despike,SliceTiming,refvol)
+function motion_slice_correction(session_dir,despike,sliceTiming,refvol)
 
-%   Removes large spikes (>7*RMSE), runs motion and slice timing 
-%   correction. 
+%   Removes large spikes (>7*RMSE), runs motion and slice timing
+%   correction.
 %
 %   Usage:
-%   motion_slice_correction(session_dir,despike,SliceTiming,refvol)
+%   motion_slice_correction(session_dir,despike,sliceTiming,refvol)
 %
 %   Defaults:
 %     despike = 1; % default will despike data
 %     SliceTiming = 1; do slice timing correction (custom script)
 %
-%   Written by Andrew S Bock June 2014
-%
-% 12/15/14      spitschan       Output to be run in the shell also saved in
-%                               file.
+%   Written by Andrew S Bock June 2016
 
 %% Set default parameters
 if ~exist('despike','var')
     despike = 1; % despike data
 end
 if ~exist('SliceTiming','var')
-    SliceTiming = 1; % do slice timing correction
+    sliceTiming = 1; % do slice timing correction
 end
 if ~exist('refvol','var')
     refvol = 1; % reference volume = 1st TR
@@ -38,7 +35,7 @@ if despike
     end
 end
 %% Slice timing correction
-if SliceTiming
+if sliceTiming
     for rr = 1:nruns
         if despike
             inFile = fullfile(session_dir,d{rr},'despike_f.nii.gz');
@@ -52,7 +49,7 @@ if SliceTiming
 end
 %% Run motion correction
 for rr = 1:nruns
-    if SliceTiming
+    if sliceTiming
         inFile = fullfile(session_dir,d{rr},'f.nii.gz');
     elseif despike
         inFile = fullfile(session_dir,d{rr},'despike_f.nii.gz');
@@ -60,5 +57,7 @@ for rr = 1:nruns
         inFile = fullfile(session_dir,d{rr},'raw_f.nii.gz');
     end
     outFile = fullfile(session_dir,d{rr},'rf.nii.gz');
-    mcflirt(inFile,outFile,refvol);
+    %mcflirt(inFile,outFile,refvol);
+    outDir = fullfile(session_dir,d{rr});
+    mri_robust_register(inFile,outFile,outDir,refvol)
 end
