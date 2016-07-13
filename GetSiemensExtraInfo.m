@@ -43,6 +43,7 @@ for i = 1:n_tags
     if isempty(idx)
         fprintf('Tag %d = %s not found in dicom header.\n',i, tags.attributes{i});
     else
+        idx = idx(end); % hack for multiple entries - ASB Jul 2016
         remain = SiemensHeader( (idx + length(tags.attributes{i}):end));
         [token, ~] = strtok(remain, [' =["]', char(32),char(10),char(13),char(9)]);
         
