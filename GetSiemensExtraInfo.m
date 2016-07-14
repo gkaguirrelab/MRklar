@@ -1,3 +1,5 @@
+function dcmhdr = GetSiemensExtraInfo(dcmfilename,dictionary)
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Extract Siemens CSA Header info from dicom header
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -21,12 +23,15 @@
 % dcmhdr.SeriesNumber
 % ...
 
-function dcmhdr = GetSiemensExtraInfo(dcmfilename,dictionary)
-
+%% Read dicom header
 dcmhdr = dicominfo(dcmfilename, 'dictionary', dictionary);
 
 SiemensHeader = char(dcmhdr.SiemensCSAHeader');
 dcmhdr.SiemensCSAHeader = SiemensHeader;
+
+ascconv = strfind(SiemensHeader, 'ASCCONV BEGIN');
+
+SiemensHeader = SiemensHeader(ascconv:end);
 
 tags.attributes = {'ucReadOutMode', 'tSequenceFileName', 'tProtocolName',...
     'alTE[0]','alTE[1]','sPat.lAccelFactPE','lEchoSpacing',...
@@ -43,7 +48,6 @@ for i = 1:n_tags
     if isempty(idx)
         fprintf('Tag %d = %s not found in dicom header.\n',i, tags.attributes{i});
     else
-        idx = idx(end); % hack for multiple entries - ASB Jul 2016
         remain = SiemensHeader( (idx + length(tags.attributes{i}):end));
         [token, ~] = strtok(remain, [' =["]', char(32),char(10),char(13),char(9)]);
         
@@ -76,7 +80,7 @@ for i = 1:n_tags
     
     eval(sprintf('dcmhdr.%s = ''%s'';\n',tags.outnames{i},tags.values{i}));
 end
-% Get slice timings from bold runs
+%% Get slice timings from bold runs
 if ~isempty(strfind(dcmhdr.tProtocolName,'bold')) || ~isempty(strfind(dcmhdr.tProtocolName,'BOLD')) ...
         || ~isempty(strfind(dcmhdr.tProtocolName,'fmri')) || ~isempty(strfind(dcmhdr.tProtocolName,'EPI')) ...
         || ~isempty(strfind(dcmhdr.tProtocolName,'ep2d')) || ~isempty(strfind(dcmhdr.tProtocolName,'fMRI'))
