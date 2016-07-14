@@ -10,11 +10,10 @@ function SaveLogInfo(theDir,functionName,varargin)
 timeStamp = datestr(now);
 
 %% Get git repository information
-% thePath = fileparts(mfilename('fullpath'));
+thePath = fileparts(mfilename('fullpath'));
+gitInfo = GetGITInfo(thePath);
 % gitPath = fullfile(thePath,'.git');
 % [~,gitInfo.Revision] = system(['git --git-dir=' gitPath ' rev-parse HEAD']);
-gitInfo = GetGITInfo(thePath);
-
 %% User name
 [~, theUser] = system('whoami');
 
