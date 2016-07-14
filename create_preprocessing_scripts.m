@@ -23,7 +23,7 @@ function create_preprocessing_scripts(session_dir,subject_name,outDir,logDir,job
 %   Example:
 %   session_dir = '/data/jet/abock/data/Network_Connectivity/ASB/11042015';
 %   subject_name = 'A101415B'; % Freesurfer subject name (may not match job_name)
-%   outDir = '/data/jet/abock/cluster_shell_scripts/preprocessing_scripts/ASB';
+%   outDir = fullfile(session_dir,'preprocessing_scripts');
 %   logDir = '/data/jet/abock/LOGS';
 %   job_name = 'A110415B'; % Name for this job/session (may not match subject_name)
 %   numRuns = 22; % number of bold runs
