@@ -1,4 +1,4 @@
-function motion_slice_correction(session_dir,despike,sliceTiming,refvol)
+function motion_slice_correction(session_dir,despike,sliceTiming,runNums,refvol)
 
 %   Removes large spikes (>7*RMSE), runs motion and slice timing
 %   correction.
@@ -19,24 +19,24 @@ end
 if ~exist('SliceTiming','var')
     sliceTiming = 1; % do slice timing correction
 end
+% Find bold run directories
+d = find_bold(session_dir);
+if ~exist('runNums','var')
+    runNums = 1:length(d);
+end
 if ~exist('refvol','var')
     refvol = 1; % reference volume = 1st TR
 end
-%% Find bold run directories
-d = find_bold(session_dir);
-nruns = length(d);
 %% Remove spikes
 if despike
-    progBar = ProgressBar(nruns,['Removing spikes from ' nruns ' runs...']);
-    for rr = 1:nruns
+    for rr = runNums
         remove_spikes(fullfile(session_dir,d{rr},'raw_f.nii.gz'),...
             fullfile(session_dir,d{rr},'despike_f.nii.gz'),fullfile(session_dir,d{rr},'raw_f_spikes'));
-        progBar(rr);
     end
 end
 %% Slice timing correction
 if sliceTiming
-    for rr = 1:nruns
+    for rr = runNums
         if despike
             inFile = fullfile(session_dir,d{rr},'despike_f.nii.gz');
         else
@@ -48,7 +48,7 @@ if sliceTiming
     end
 end
 %% Run motion correction
-for rr = 1:nruns
+for rr = runNums
     if sliceTiming
         inFile = fullfile(session_dir,d{rr},'f.nii.gz');
     elseif despike

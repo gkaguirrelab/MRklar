@@ -93,15 +93,22 @@ SaveLogInfo(session_dir,mfilename,session_dir,subject_name,outDir,logDir,job_nam
 if ~exist('outDir','dir')
     mkdir(outDir);
 end
+% anatomical
 create_submit_anatomical_script(outDir,logDir,job_name,amem);
+% motion correction
+create_submit_motion_script(outDir,logDir,job_name,numRuns,fmem);
+% functional
 create_submit_functional_script(outDir,logDir,job_name,numRuns,fmem);
+% anatomical, motion correction, and functional (i.e. 'all')
 create_submit_all_script(outDir,logDir,job_name,fmem)
 %% Create job scripts
 % anatomical
-create_anatomical_script(session_dir,subject_name,outDir,job_name,reconall,slicetiming,refvol);
+create_anatomical_script(session_dir,subject_name,outDir,job_name,reconall);
+% motion correction
+create_motion_script(session_dir,outDir,job_name,numRuns,slicetiming,refvol);
 % functional
 create_functional_script(session_dir,subject_name,outDir,job_name,numRuns,filtType,lowHz,highHz,physio,motion,task,localWM,anat);
-% both anatomical and functional (i.e. 'all')
+% anatomical, motion correction, and functional (i.e. 'all')
 create_all_script(session_dir,subject_name,outDir,job_name,reconall,slicetiming,refvol,numRuns,filtType,lowHz,highHz,physio,motion,...
     task,localWM,anat);
 % Make executable

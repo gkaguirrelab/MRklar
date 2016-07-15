@@ -25,8 +25,8 @@ for i = 1:length(inVols)
     dstFile = fullfile(outDir,inVols{refvol}); % register to first volume
     outFile = fullfile(outDir,sprintf('tmp_%04d.nii.gz',i));
     [~,~] = system(['mri_robust_register --mov ' inFile ...
-        ' --dst ' dstFile ' --lta ' sprintf('%04d.lta',i) ' --vox2vox --satit --mapmov ' ...
-        outFile]);
+        ' --dst ' dstFile ' --lta ' fullfile(outDir,sprintf('%04d.lta',i)) ...
+        ' --vox2vox --satit --mapmov ' outFile]);
     progBar(i);
 end
 system(['rm ' fullfile(outDir,'split_f0*')]); % remove split volumes
