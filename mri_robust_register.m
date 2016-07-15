@@ -15,32 +15,37 @@ function mri_robust_register(inVol,outVol,outDir,refvol)
 %
 %   Written by Andrew S Bock May 2016
 
+%% Set output for .lta files
+outMC = fullfile(outDir,'mc');
+if ~exist(outMC,'dir')
+   mkdir(outMC); 
+end
 %% Split input 4D volume into 3D volumes
-system(['mri_convert ' inVol ' ' fullfile(outDir,'split_f.nii.gz') ' --split']);
+system(['mri_convert ' inVol ' ' fullfile(outMC,'split_f.nii.gz') ' --split']);
 %% Register volumes
-inVols = listdir(fullfile(outDir,'split_f0*'),'files');
+inVols = listdir(fullfile(outMC,'split_f0*'),'files');
 progBar = ProgressBar(length(inVols),'mri_robust_registering...');
 for i = 1:length(inVols)
-    inFile = fullfile(outDir,inVols{i});
-    dstFile = fullfile(outDir,inVols{refvol}); % register to first volume
-    outFile = fullfile(outDir,sprintf('tmp_%04d.nii.gz',i));
+    inFile = fullfile(outMC,inVols{i});
+    dstFile = fullfile(outMC,inVols{refvol}); % register to first volume
+    outFile = fullfile(outMC,sprintf('tmp_%04d.nii.gz',i));
     [~,~] = system(['mri_robust_register --mov ' inFile ...
-        ' --dst ' dstFile ' --lta ' fullfile(outDir,sprintf('%04d.lta',i)) ...
+        ' --dst ' dstFile ' --lta ' fullfile(outMC,sprintf('%04d.lta',i)) ...
         ' --vox2vox --satit --mapmov ' outFile]);
     progBar(i);
 end
-system(['rm ' fullfile(outDir,'split_f0*')]); % remove split volumes
+system(['rm ' fullfile(outMC,'split_f0*')]); % remove split volumes
 %% Merge into output 4D volume
 commandc = ['fslmerge -t ' outVol];
 for i = 1:length(inVols)
-    outFile = fullfile(outDir,sprintf('tmp_%04d.nii.gz',i));
+    outFile = fullfile(outMC,sprintf('tmp_%04d.nii.gz',i));
     commandc = [commandc ' ' outFile];
 end
 system(commandc);
-system(['rm ' fullfile(outDir,'tmp_*nii.gz')]); % remove tmp volumes
+system(['rm ' fullfile(outMC,'tmp_*nii.gz')]); % remove tmp volumes
 %% Convert .lta files to translations and rotations
 clear x y z pitch yaw roll
-ltaFiles = listdir(fullfile(outDir,'*.lta'),'files');
+ltaFiles = listdir(fullfile(outMC,'*.lta'),'files');
 x       = nan(1,length(ltaFiles));
 y       = nan(1,length(ltaFiles));
 z       = nan(1,length(ltaFiles));
@@ -48,7 +53,7 @@ pitch   = nan(1,length(ltaFiles));
 yaw     = nan(1,length(ltaFiles));
 roll    = nan(1,length(ltaFiles));
 for i = 1:length(ltaFiles);
-    inFile = fullfile(outDir,ltaFiles{i});
+    inFile = fullfile(outMC,ltaFiles{i});
     [x(i),y(i),z(i),pitch(i),yaw(i),roll(i)] = convertlta2tranrot(inFile);
 end
 motion_params = [pitch',yaw',roll',x',y',z'];
