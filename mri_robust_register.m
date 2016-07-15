@@ -18,7 +18,7 @@ function mri_robust_register(inVol,outVol,outDir,refvol)
 %% Set output for .lta files
 outMC = fullfile(outDir,'mc');
 if ~exist(outMC,'dir')
-   mkdir(outMC); 
+    mkdir(outMC);
 end
 %% Split input 4D volume into 3D volumes
 system(['mri_convert ' inVol ' ' fullfile(outMC,'split_f.nii.gz') ' --split']);
