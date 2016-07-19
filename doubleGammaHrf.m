@@ -5,11 +5,11 @@ function [hrf] = doubleGammaHrf(TR,tp,beta,rt,len)
 %   Usage: [hrf] = doubleGammaHrf(TR,tp,fwhm,alp,len)
 %
 %   Defaults:
-%       TR = 1; Repetition time
-%       tp = [6 16]; time to peak/undershoot
-%       beta = [1 1]; scale of peak/undershoot
-%       rt = 1/6; ratio of response to undershoot
-%       len = 33; length of HRF (in seconds)%
+%       TR = 1; % Repetition time
+%       tp = [6 16]; % time to peak/undershoot (in seconds)
+%       beta = [1 1]; % scale of peak/undershoot
+%       rt = 1/6; % ratio of response to undershoot
+%       len = 33; % length of HRF (in seconds)
 %
 %   Equations modeled after:
 %       Glover (1999) NeuroImage
@@ -45,8 +45,8 @@ if ~exist('len','var')
 end
 %% Create HRF
 dx = TR:TR:len;
-A = [0 gampdf(dx,tp(1),beta(1))];
-B = [0 gampdf(dx,tp(2),beta(2))];
+A = [0 gampdf(dx,tp(1)+1,beta(1))]; % add one to tp(1) (seconds -> index)
+B = [0 gampdf(dx,tp(2)+1,beta(2))]; % add one to tp(2) (seconds -> index)
 hrf = A - rt*B;
 hrf = hrf'/sum(hrf);
 %%
