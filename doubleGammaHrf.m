@@ -49,5 +49,6 @@ A = [0 gampdf(dx,tp(1)+1,beta(1))]; % add one to tp(1) (seconds -> index)
 B = [0 gampdf(dx,tp(2)+1,beta(2))]; % add one to tp(2) (seconds -> index)
 hrf = A - rt*B;
 hrf = hrf'/sum(hrf);
+hrf = hrf(1:end-1); % remove the extra value, since we added zero above
 %%
 %hrf = hrf(1:floor(len/TR))/sum(hrf(1:floor(len/TR)));
