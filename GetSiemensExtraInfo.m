@@ -90,7 +90,10 @@ if ~isempty(strfind(dcmhdr.tProtocolName,'bold')) || ~isempty(strfind(dcmhdr.tPr
     % Get the strings between 'MosaicRefAcqTimes' and 'AutoInlineImageFilterEnabled'
     startidx    = strfind(Achar, 'MosaicRefAcqTimes');
     endidx      = strfind(Achar, 'AutoInlineImageFilterEnabled');
-    remain      = Achar( (startidx(1):(endidx-1)));
+    remain      = Achar(startidx(1):(endidx-1));
+    % Remove any numbers before 'FD'
+    startidx    = strfind(remain,'FD');
+    remain      = remain(startidx(1):end);
     % Find the slice timing values (based on the '.', e.g. '470.0000')
     I = strfind(remain,'.');
     tmpcell = cell(length(I),1);

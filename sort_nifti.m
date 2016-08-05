@@ -25,11 +25,12 @@ dicom_sort(dicom_dir);
 series = listdir(dicom_dir,'dirs');
 % process series types
 if ~isempty(series)
-    mpragect = 0;
-    mp2ragect = 0;
-    PDct = 0;
-    boldct = 0;
-    DTIct = 0;
+    mpragect    = 0;
+    T2ct        = 0;
+    mp2ragect   = 0;
+    PDct        = 0;
+    boldct      = 0;
+    DTIct       = 0;
     progBar = ProgressBar(length(series),'Converting dicoms');
     for s = 1:length(series)
         fprintf(['\nProcessing ' series{s} ' series ' num2str(s) ' of ' ...
@@ -46,6 +47,16 @@ if ~isempty(series)
             dicom_nii(fullfile(dicom_dir,series{s}),outputDir,outputFile);
             inputFile = 'MPRAGE';
             ACPC(outputDir,inputFile);
+            system(['echo ' series{s} ' > ' fullfile(outputDir,'series_name')]);
+            disp('done.')
+        elseif (~isempty(strfind(series{s},'T2')) || ~isempty(strfind(series{s},'T2w')));
+            T2ct = T2ct + 1;
+            fprintf(['\nPROCESSING T2 IMAGE ' sprintf('%03d', T2ct) '\n']);
+            % Convert dicoms to nifti
+            outputDir = fullfile(session_dir,'T2w',sprintf('%03d', T2ct));
+            mkdir(outputDir);
+            outputFile = 'T2w.nii.gz';
+            dicom_nii(fullfile(dicom_dir,series{s}),outputDir,outputFile);
             system(['echo ' series{s} ' > ' fullfile(outputDir,'series_name')]);
             disp('done.')
         elseif ~isempty(strfind(series{s},'mp2rage'));
