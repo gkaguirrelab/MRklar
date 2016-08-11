@@ -6,19 +6,19 @@ function create_preprocessing_scripts(session_dir,subject_name,outDir,logDir,job
 %   create_preprocessing_scripts(session_dir,subject_name,outDir,logDir,job_name,numRuns,reconall,slicetiming,refvol,filtType,lowHz,highHz,physio,motion,task,localWM,anat,amem,fmem)
 %
 %   Defaults:
-%   reconall = 0; run recon-all (default - off)
+%   reconall    = 0; run recon-all (default - off)
 %   slicetiming = 1; correct slice timings
-%   B0 = 0; B0 unwarping (default - off)
-%   filtType = 'high'; highpass filter
-%   lowHz = 0.01; % note - only applies when filtType = 'high' or 'band'
-%   highHz = 0.10; % note - only applies when filtType = 'low' or 'band'
-%   physio = 0; physiological noise removal from pulseOx (default - off)
-%   motion = 1; noise removal from motion
-%   task = 0; orthogonalization to task regressors (default - off)
-%   localWM = 1; removal of noise derived from local white matter (default - on)
-%   anat = 1; removal of noise derived from anatomical ROIs
-%   amem = 20; memory for anatomical scripts
-%   fmem = 50; memory for functional scripts
+%   refvol      = 1; motion correct to the first volume
+%   filtType    = 'high'; highpass filter
+%   lowHz       = 0.01; % note - only applies when filtType = 'high' or 'band'
+%   highHz      = 0.10; % note - only applies when filtType = 'low' or 'band'
+%   physio      = 0; physiological noise removal from pulseOx (default - off)
+%   motion      = 1; noise removal from motion
+%   task        = 0; orthogonalization to task regressors (default - off)
+%   localWM     = 1; removal of noise derived from local white matter (default - on)
+%   anat        = 1; removal of noise derived from anatomical ROIs
+%   amem        = 20; memory for anatomical scripts
+%   fmem        = 50; memory for functional scripts
 %
 %   Example:
 %   session_dir = '/data/jet/abock/data/Network_Connectivity/ASB/11042015';
