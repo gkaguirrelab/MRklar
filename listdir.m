@@ -32,3 +32,5 @@ elseif strcmp(type,'dirs')
 else
     disp('missing "type" input')
 end
+% transpose output for ease of viewing
+outList = outList';
