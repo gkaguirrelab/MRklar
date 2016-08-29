@@ -89,10 +89,9 @@ xhemi_check(session_dir,subject_name);
 %   despikeing and slice timing correction.  
 motion_slice_correction(session_dir);
 %% Register functional runs to anatomical image
-% Registers the motion corrected and B0 unwarped functional volumes from
-%   feat_mc to the corresponding Freesurfer anatomical image for the bold 
-%   directory specified by 'runNum'. 
-register_feat(session_dir,subject_name,runNum);
+% Registers the functional volumes from to the corresponding Freesurfer 
+%   anatomical image for the bold directory specified by 'runNum'. 
+register_func(session_dir,subject_name,runNum);
 %% Project anatomical ROIs to functional space
 % Projects anatomical ROIs into functional space for the bold directory
 %   specified by 'runNum'.
