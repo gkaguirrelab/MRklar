@@ -1,9 +1,9 @@
-function mri_robust_register(inVol,outVol,outDir,refvol)
+function mri_robust_register(inVol,outVol,outDir,refvol,dstFile)
 
 % Motion corrects a 4D volume using Freesurfer's 'mri_robust_register'
 %
 %   Usage:
-%   mri_robust_register(inVol,outVol,outDir,refvol)
+%   mri_robust_register(inVol,outVol,outDir,refvol,dstFile)
 %
 %   Based on:
 %   Highly Accurate Inverse Consistent Registration: A Robust Approach
@@ -22,12 +22,15 @@ if ~exist(outMC,'dir')
 end
 %% Split input 4D volume into 3D volumes
 system(['mri_convert ' inVol ' ' fullfile(outMC,'split_f.nii.gz') ' --split']);
+system(['fslroi ' inVol ' ' fullfile(outMC,'split_f.nii.gz') ' --split']);
 %% Register volumes
 inVols = listdir(fullfile(outMC,'split_f0*'),'files');
+if ~exist('dstFile','var')
+    dstFile = fullfile(outMC,inVols{refvol}); % register to first volume of run
+end
 progBar = ProgressBar(length(inVols),'mri_robust_registering...');
 for i = 1:length(inVols)
     inFile = fullfile(outMC,inVols{i});
-    dstFile = fullfile(outMC,inVols{refvol}); % register to first volume
     outFile = fullfile(outMC,sprintf('tmp_%04d.nii.gz',i));
     [~,~] = system(['mri_robust_register --mov ' inFile ...
         ' --dst ' dstFile ' --lta ' fullfile(outMC,sprintf('%04d.lta',i)) ...

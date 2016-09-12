@@ -1,115 +1,126 @@
-function create_preprocessing_scripts(session_dir,subject_name,outDir,logDir,job_name,numRuns,reconall,slicetiming,refvol,filtType,lowHz,highHz,physio,motion,task,localWM,anat,amem,fmem)
+function create_preprocessing_scripts(params)
 
 % Writes shell scripts to preprocess MRI data on the UPenn cluster.
 %
 %   Usage:
-%   create_preprocessing_scripts(session_dir,subject_name,outDir,logDir,job_name,numRuns,reconall,slicetiming,refvol,filtType,lowHz,highHz,physio,motion,task,localWM,anat,amem,fmem)
+%   create_preprocessing_scripts(params)
 %
-%   Defaults:
-%   reconall    = 0; run recon-all (default - off)
-%   slicetiming = 1; correct slice timings
-%   refvol      = 1; motion correct to the first volume
-%   filtType    = 'high'; highpass filter
-%   lowHz       = 0.01; % note - only applies when filtType = 'high' or 'band'
-%   highHz      = 0.10; % note - only applies when filtType = 'low' or 'band'
-%   physio      = 0; physiological noise removal from pulseOx (default - off)
-%   motion      = 1; noise removal from motion
-%   task        = 0; orthogonalization to task regressors (default - off)
-%   localWM     = 1; removal of noise derived from local white matter (default - on)
-%   anat        = 1; removal of noise derived from anatomical ROIs
-%   amem        = 20; memory for anatomical scripts
-%   fmem        = 50; memory for functional scripts
+%   params field names:
+%   params.sessionDir       = full path to session directory
+%   params.subjectName      = freesurfer subject name
+%   params.outDir           = full path to script output directory
+%   params.logDir           = full path to log file directory
+%   params.jobName          = job name (typically subjectName)
+%   params.numRuns          = number of functional runs
+%   params.reconall         = run FreeSurfer's reconall (default = 0)
+%   params.slicetiming      = correct slice timings (default = 1)
+%   params.refvol           = reference volume number for motion correction (default = 1)
+%   params.regFirst         = register all runs to first bold run (default = 1)
+%   params.filtType         = type of temporal filter (default = 'high')
+%   params.lowHz            = only used in 'high' or 'band' temporal filters
+%   params.highHz           = only used in 'low or 'band' temporal filters
+%   params.physio           = physiological noise removal using pulse ox (default = 0)
+%   params.motion           = noise removal using head motion (default = 1)
+%   params.task             = orthogonalization to task regressors (default = 0)
+%   params.localWM          = removal of noise derived from local white matter (default = 1)
+%   params.anat             = removal of noise derived from anatomical ROIs (default = 1)
+%   params.amem             = memory for anatomical scripts (default = 20)
+%   params.fmem             = memory for functional scripts (default = 50)
 %
 %   Example:
-%   session_dir = '/data/jet/abock/data/Network_Connectivity/ASB/11042015';
-%   subject_name = 'A101415B'; % Freesurfer subject name (may not match job_name)
-%   outDir = fullfile(session_dir,'preprocessing_scripts');
-%   logDir = '/data/jet/abock/LOGS';
-%   job_name = 'A110415B'; % Name for this job/session (may not match subject_name)
-%   numRuns = 22; % number of bold runs
-%   reconall = 0;
-%   slicetiming = 1; % correct slice timings
-%   refvol = 1; % motion correct to 1st TR
-%   filtType = 'high';
-%   lowHz = 0.01;
-%   highHz = 0.10;
-%   physio = 1;
-%   motion = 1;
-%   task = 0;
-%   localWM = 1;
-%   anat = 1;
-%   amem = 20;
-%   fmem = 50;
-%   create_preprocessing_scripts(session_dir,subject_name,outDir,logDir,...
-%       job_name,numRuns,reconall,slicetiming,refvol,filtType,lowHz,highHz,...
-%       physio,motion,task,localWM,anat,amem,fmem);
+%   params.sessionDir = '/data/jet/abock/data/Network_Connectivity/ASB/11042015';
+%   params.subjectName = 'A101415B'; 
+%   params.outDir = fullfile(params.sessionDir,'preprocessing_scripts');
+%   params.logDir = '/data/jet/abock/LOGS';
+%   params.jobName = params.subjectName;
+%   params.numRuns = 22; % number of bold runs
+%   params.reconall = 0;
+%   params.slicetiming = 1; 
+%   params.refvol = 1; 
+%   params.regFirst = 1;
+%   params.filtType = 'high';
+%   params.lowHz = 0.01;
+%   params.highHz = 0.10;
+%   params.physio = 1;
+%   params.motion = 1;
+%   params.task = 0;
+%   params.localWM = 1;
+%   params.anat = 1;
+%   params.amem = 20;
+%   params.fmem = 50;
+%   create_preprocessing_scripts(params);
 %
 %   Written by Andrew S Bock Aug 2015
 
 %% Set defaults
-if ~exist('reconall','var')
-    reconall = 0;
+if ~isfield(params,'reconall')
+    params.reconall = 0;
 end
-if ~exist('slicetiming','var')
-    slicetiming = 1;
+if ~isfield(params,'slicetiming')
+    params.slicetiming = 1;
 end
-if ~exist('refvol','var')
-    refvol = 1;
+if ~isfield(params,'refvol')
+    params.refvol = 1;
 end
-if ~exist('filtType','var')
-    filtType = 'high';
+if ~isfield(params,'regFirst')
+    params.regFirst = 1;
 end
-if ~exist('lowHz','var')
-    lowHz = 0.01;
+if ~isfield(params,'filtType')
+    params.filtType = 'high';
 end
-if ~exist('highHz','var')
-    highHz = 0.10;
+if ~isfield(params,'lowHz')
+    params.lowHz = 0.01;
 end
-if ~exist('physio','var')
-    physio = 0;
+if ~isfield(params,'highHz')
+    params.highHz = 0.10;
 end
-if ~exist('motion','var')
-    motion = 1;
+if ~isfield(params,'physio')
+    params.physio = 0;
 end
-if ~exist('task','var')
-    task = 0;
+if ~isfield(params,'motion')
+    params.motion = 1;
 end
-if ~exist('localWM','var')
-    localWM = 1;
+if ~isfield(params,'task')
+    params.task = 0;
 end
-if ~exist('anat','var')
-    anat = 1;
+if ~isfield(params,'localWM')
+    params.localWM = 1;
 end
-if ~exist('amem','var')
-    amem = 20;
+if ~isfield(params,'anat')
+    params.anat = 1;
 end
-if ~exist('fmem','var')
-    fmem = 50;
+if ~isfield(params,'amem')
+    params.amem = 20;
+end
+if ~isfield(params,'fmem')
+    params.fmem = 20;
 end
 %% Add to log
-SaveLogInfo(session_dir,mfilename,session_dir,subject_name,outDir,logDir,job_name,numRuns,reconall,slicetiming,refvol,filtType,lowHz,highHz,physio,motion,task,localWM,anat,amem,fmem);
-
+diary ON;
+logFile = fullfile(params.sessionDir,'LOG');
+dairy(logFile);
+disp('create_preprocessing_scripts');
+disp('params = ');
+disp(params);
+diary OFF;
 %% Create submit scripts
-if ~exist('outDir','dir')
-    mkdir(outDir);
+if ~exist(params.outDir,'dir')
+    mkdir(params.outDir);
 end
 % anatomical
-create_submit_anatomical_script(outDir,logDir,job_name,amem);
+create_submit_anatomical_script(params);
 % motion correction
-create_submit_motion_script(outDir,logDir,job_name,numRuns,fmem);
+create_submit_motion_script(params);
 % functional
-create_submit_functional_script(outDir,logDir,job_name,numRuns,fmem);
+create_submit_functional_script(params);
 % anatomical, motion correction, and functional (i.e. 'all')
-create_submit_all_script(outDir,logDir,job_name,fmem)
+create_submit_all_script(params)
 %% Create job scripts
 % anatomical
-create_anatomical_script(session_dir,subject_name,outDir,job_name,reconall);
+create_anatomical_script(params);
 % motion correction
-create_motion_script(session_dir,outDir,job_name,numRuns,slicetiming,refvol);
+create_motion_script(params);
 % functional
-create_functional_script(session_dir,subject_name,outDir,job_name,numRuns,filtType,lowHz,highHz,physio,motion,task,localWM,anat);
+create_functional_script(params);
 % anatomical, motion correction, and functional (i.e. 'all')
-create_all_script(session_dir,subject_name,outDir,job_name,reconall,slicetiming,refvol,numRuns,filtType,lowHz,highHz,physio,motion,...
-    task,localWM,anat);
-% Make executable
-system(['chmod +x ' fullfile(outDir,'*')]);
+create_all_script(params);

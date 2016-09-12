@@ -1,4 +1,4 @@
-function motion_slice_correction(session_dir,despike,sliceTiming,runNums,refvol)
+function motion_slice_correction(session_dir,despike,sliceTiming,runNums,refvol,regFirst)
 
 %   Removes large spikes (>7*RMSE), runs motion and slice timing
 %   correction.
@@ -59,5 +59,12 @@ for rr = runNums
     outFile = fullfile(session_dir,d{rr},'rf.nii.gz');
     %mcflirt(inFile,outFile,refvol);
     outDir = fullfile(session_dir,d{rr});
-    mri_robust_register(inFile,outFile,outDir,refvol)
+    if regFirst
+        dstFile = fullfile(session_dir,d{rr},'dstFile.nii.gz');
+        system(['fslroi ' fullfile(session_dir,d{1},'rf.nii.gz') ...
+            ' ' dstFile ' 0 1']);
+        mri_robust_register(inFile,outFile,outDir,refvol,dstFile);
+    else
+        mri_robust_register(inFile,outFile,outDir,refvol);
+    end
 end
