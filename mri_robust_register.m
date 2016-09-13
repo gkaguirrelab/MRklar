@@ -60,4 +60,4 @@ for i = 1:length(ltaFiles);
     [x(i),y(i),z(i),pitch(i),yaw(i),roll(i)] = convertlta2tranrot(inFile);
 end
 motion_params = [pitch',yaw',roll',x',y',z'];
-dlmwrite(fullfile(outDir,'motion_params.txt'),motion_params,'delimiter',' ','precision','%10.5f');
+dlmwrite(fullfile(outMC,'motion_params.txt'),motion_params,'delimiter',' ','precision','%10.5f');
