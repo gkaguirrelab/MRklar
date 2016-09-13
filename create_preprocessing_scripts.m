@@ -98,7 +98,7 @@ end
 %% Add to log
 diary ON;
 logFile = fullfile(params.sessionDir,'LOG');
-dairy(logFile);
+diary(logFile);
 disp('create_preprocessing_scripts');
 disp('params = ');
 disp(params);
