@@ -1,4 +1,4 @@
-function sort_nifti(session_dir,dicom_dir)
+function sort_nifti(session_dir,dicom_dir,useMRIcron)
 
 %   Sorts dicoms into series directories, converts to nifti files based on
 %   series type (e.g. MPRAGE, BOLD, DTI). Also ACPC aligns anatomical
@@ -20,6 +20,9 @@ function sort_nifti(session_dir,dicom_dir)
 if ~exist('dicom_dir','var')
     dicom_dir = fullfile(session_dir,'DICOMS');
 end
+if ~exist('useMRIcron','var')
+    useMRIcron = 1; % use 'MRIcron'
+end
 %% sort dicoms within this directory
 dicom_sort(dicom_dir);
 series = listdir(dicom_dir,'dirs');
@@ -30,6 +33,7 @@ if ~isempty(series)
     mp2ragect   = 0;
     PDct        = 0;
     boldct      = 0;
+    fieldct     = 0;
     DTIct       = 0;
     progBar = ProgressBar(length(series),'Converting dicoms');
     for s = 1:length(series)
@@ -44,7 +48,7 @@ if ~isempty(series)
             outputDir = fullfile(session_dir,'MPRAGE',sprintf('%03d', mpragect));
             mkdir(outputDir);
             outputFile = 'MPRAGE.nii.gz';
-            dicom_nii(fullfile(dicom_dir,series{s}),outputDir,outputFile);
+            dicom_nii(fullfile(dicom_dir,series{s}),outputDir,outputFile,useMRIcron);
             inputFile = 'MPRAGE';
             ACPC(outputDir,inputFile);
             system(['echo ' series{s} ' > ' fullfile(outputDir,'series_name')]);
@@ -56,7 +60,7 @@ if ~isempty(series)
             outputDir = fullfile(session_dir,'T2w',sprintf('%03d', T2ct));
             mkdir(outputDir);
             outputFile = 'T2w.nii.gz';
-            dicom_nii(fullfile(dicom_dir,series{s}),outputDir,outputFile);
+            dicom_nii(fullfile(dicom_dir,series{s}),outputDir,outputFile,useMRIcron);
             system(['echo ' series{s} ' > ' fullfile(outputDir,'series_name')]);
             disp('done.')
         elseif ~isempty(strfind(series{s},'mp2rage'));
@@ -66,7 +70,7 @@ if ~isempty(series)
             outputDir = fullfile(session_dir,'MP2RAGE',sprintf('%03d',mp2ragect));
             mkdir(outputDir);
             outputFile = 'MP2RAGE.nii.gz';
-            dicom_nii(fullfile(dicom_dir,series{s}),outputDir,outputFile)
+            dicom_nii(fullfile(dicom_dir,series{s}),outputDir,outputFile,useMRIcron)
             inputFile = 'MP2RAGE';
             ACPC(outputDir,inputFile);
             system(['echo ' series{s} ' > ' fullfile(outputDir,'series_name')]);
@@ -78,7 +82,7 @@ if ~isempty(series)
             outputDir = fullfile(session_dir,'PD',sprintf('%03d',PDct));
             mkdir(outputDir);
             outputFile = 'PD.nii.gz';
-            dicom_nii(fullfile(dicom_dir,series{s}),outputDir,outputFile)
+            dicom_nii(fullfile(dicom_dir,series{s}),outputDir,outputFile,useMRIcron)
             system(['echo ' series{s} ' > ' fullfile(outputDir,'series_name')]);
             disp('done.')
         elseif (~isempty(strfind(series{s},'ep2d')) || ~isempty(strfind(series{s},'BOLD')) ...
@@ -92,10 +96,26 @@ if ~isempty(series)
             outputDir = fullfile(session_dir,series{s});
             mkdir(outputDir);
             outputFile = 'raw_f.nii.gz';
-            dicom_nii(fullfile(dicom_dir,series{s}),outputDir,outputFile)
+            dicom_nii(fullfile(dicom_dir,series{s}),outputDir,outputFile,useMRIcron)
             system(['echo ' series{s} ' > ' fullfile(outputDir,'series_name')]);
             echo_spacing(fullfile(dicom_dir,series{s}),outputDir);
             slice_timing(fullfile(dicom_dir,series{s}),outputDir);
+            disp('done.')
+        elseif ~isempty(strfind(series{s},'SpinEchoFieldMap'))
+            fieldct = fieldct + 1;
+            fprintf(['\nPROCESSING FIELDMAP IMAGE ' sprintf('%03d', fieldct) '\n']);
+            % Convert dicoms to nifti
+            outputDir = fullfile(session_dir,series{s});
+            mkdir(outputDir);
+            if strfind(series{s},'SpinEchoFieldMap_AP')
+                outputFile = 'SpinEchoFieldMap_AP.nii.gz';
+            elseif strfind(series{s},'SpinEchoFieldMap_PA')
+                outputFile = 'SpinEchoFieldMap_PA.nii.gz';
+            else
+                error('SpinEchoFieldMap type not AP or PA');
+            end
+            dicom_nii(fullfile(dicom_dir,series{s}),outputDir,outputFile,useMRIcron);
+            system(['echo ' series{s} ' > ' fullfile(outputDir,'series_name')]);
             disp('done.')
         elseif ~isempty(strfind(series{s},'DTI'));
             DTIct = DTIct + 1;
@@ -104,7 +124,7 @@ if ~isempty(series)
             outputDir = fullfile(session_dir,series{s});
             mkdir(outputDir);
             outputFile = 'raw_d.nii.gz';
-            dicom_nii(fullfile(dicom_dir,series{s}),outputDir,outputFile)
+            dicom_nii(fullfile(dicom_dir,series{s}),outputDir,outputFile,useMRIcron)
             disp('done.')
         end
         progBar(s);
