@@ -51,18 +51,20 @@ end
 for rr = runNums
     if sliceTiming
         inFile = fullfile(session_dir,d{rr},'f.nii.gz');
+        regFile = fullfile(session_dir,d{1},'f.nii.gz');
     elseif despike
         inFile = fullfile(session_dir,d{rr},'despike_f.nii.gz');
+        regFile = fullfile(session_dir,d{1},'despike_f.nii.gz');
     else
         inFile = fullfile(session_dir,d{rr},'raw_f.nii.gz');
+        regFile = fullfile(session_dir,d{1},'raw_f.nii.gz');
     end
     outFile = fullfile(session_dir,d{rr},'rf.nii.gz');
     %mcflirt(inFile,outFile,refvol);
     outDir = fullfile(session_dir,d{rr});
     if regFirst
         dstFile = fullfile(session_dir,d{rr},'dstFile.nii.gz');
-        system(['fslroi ' fullfile(session_dir,d{1},'rf.nii.gz') ...
-            ' ' dstFile ' 0 1']);
+        system(['fslroi ' regFile ' ' dstFile ' 0 1']);
         mri_robust_register(inFile,outFile,outDir,refvol,dstFile);
     else
         mri_robust_register(inFile,outFile,outDir,refvol);
