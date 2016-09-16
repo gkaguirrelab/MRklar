@@ -33,12 +33,13 @@ if ~isempty(series)
     mp2ragect   = 0;
     PDct        = 0;
     boldct      = 0;
-    fieldct     = 0;
+    APct        = 0;
+    PAct        = 0;
     DTIct       = 0;
     progBar = ProgressBar(length(series),'Converting dicoms');
     for s = 1:length(series)
         fprintf(['\nProcessing ' series{s} ' series ' num2str(s) ' of ' ...
-            num2str(length(series)) '\n\n'])
+            num2str(length(series)) '\n\n']);
         % Anatomical image
         if (~isempty(strfind(series{s},'MPRAGE')) || ~isempty(strfind(series{s},'T1w'))) ...
                 && isempty(strfind(series{s},'MPRAGE_NAV'));
@@ -102,20 +103,22 @@ if ~isempty(series)
             slice_timing(fullfile(dicom_dir,series{s}),outputDir);
             disp('done.')
         elseif ~isempty(strfind(series{s},'SpinEchoFieldMap'))
-            fieldct = fieldct + 1;
-            fprintf(['\nPROCESSING FIELDMAP IMAGE ' sprintf('%03d', fieldct) '\n']);
+            fprintf('\nPROCESSING FIELDMAP IMAGE\n');
             % Convert dicoms to nifti
-            outputDir = fullfile(session_dir,series{s});
+            outputDir = fullfile(session_dir,'SpinEchoFieldMap');
             mkdir(outputDir);
-            if strfind(series{s},'SpinEchoFieldMap_AP')
-                outputFile = 'SpinEchoFieldMap_AP.nii.gz';
-            elseif strfind(series{s},'SpinEchoFieldMap_PA')
-                outputFile = 'SpinEchoFieldMap_PA.nii.gz';
+            if ~isempty(strfind(series{s},'SpinEchoFieldMap_AP'))
+                APct = APct + 1;
+                outputFile = (['SpinEchoFieldMap_AP_' sprintf('%02d', APct) '.nii.gz']);
+                system(['echo ' series{s} ' > ' fullfile(outputDir,['series_name_AP' sprintf('%02d', APct)])]);
+            elseif ~isempty(strfind(series{s},'SpinEchoFieldMap_PA'))
+                PAct = PAct + 1;
+                outputFile = (['SpinEchoFieldMap_PA_' sprintf('%02d', PAct) '.nii.gz']);
+                system(['echo ' series{s} ' > ' fullfile(outputDir,['series_name_PA' sprintf('%02d', PAct)])]);
             else
                 error('SpinEchoFieldMap type not AP or PA');
             end
             dicom_nii(fullfile(dicom_dir,series{s}),outputDir,outputFile,useMRIcron);
-            system(['echo ' series{s} ' > ' fullfile(outputDir,'series_name')]);
             disp('done.')
         elseif ~isempty(strfind(series{s},'DTI'));
             DTIct = DTIct + 1;

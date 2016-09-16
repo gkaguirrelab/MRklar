@@ -1,9 +1,9 @@
-function mri_robust_register(inVol,outVol,outDir,refvol,dstFile)
+function mri_robust_register(params,mcParams)
 
 % Motion corrects a 4D volume using Freesurfer's 'mri_robust_register'
 %
 %   Usage:
-%   mri_robust_register(inVol,outVol,outDir,refvol,dstFile)
+%   mri_robust_register(params)
 %
 %   Based on:
 %   Highly Accurate Inverse Consistent Registration: A Robust Approach
@@ -11,41 +11,71 @@ function mri_robust_register(inVol,outVol,outDir,refvol,dstFile)
 %   NeuroImage 53(4), pp. 1181-1196, 2010.
 %
 %   Note:
-%   refvol = 1 is the first volume
+%   params.refvol = 1 is the first volume
 %
 %   Written by Andrew S Bock May 2016
-
-%% Set output for .lta files
-outMC = fullfile(outDir,'mc');
+%% Set defaults
+outMC = fullfile(mcParams.outDir,'mc');
 if ~exist(outMC,'dir')
     mkdir(outMC);
 end
 %% Split input 4D volume into 3D volumes
-system(['mri_convert ' inVol ' ' fullfile(outMC,'split_f.nii.gz') ' --split']);
-system(['fslroi ' inVol ' ' fullfile(outMC,'split_f.nii.gz') ' --split']);
+%system(['mri_convert ' params.mcFile ' ' fullfile(outMC,'split_f.nii.gz') ' --split']);
+system(['fslsplit ' mcParams.mcFile ' ' fullfile(outMC,'split_f')]);
+%system(['fslroi ' params.mcFile ' ' fullfile(outMC,'split_f.nii.gz') ' --split']);
 %% Register volumes
 inVols = listdir(fullfile(outMC,'split_f0*'),'files');
-if ~exist('dstFile','var')
-    dstFile = fullfile(outMC,inVols{refvol}); % register to first volume of run
+if ~isfield(params,'regFirst') || ~params.regFirst
+    mcParams.dstFile = fullfile(outMC,inVols{params.refvol}); % register to first volume of run
 end
 progBar = ProgressBar(length(inVols),'mri_robust_registering...');
-for i = 1:length(inVols)
-    inFile = fullfile(outMC,inVols{i});
-    outFile = fullfile(outMC,sprintf('tmp_%04d.nii.gz',i));
-    [~,~] = system(['mri_robust_register --mov ' inFile ...
-        ' --dst ' dstFile ' --lta ' fullfile(outMC,sprintf('%04d.lta',i)) ...
-        ' --vox2vox --satit --mapmov ' outFile]);
-    progBar(i);
+% Motion correct
+if ~isfield(params,'topup') || ~params.topup
+    for i = 1:length(inVols)
+        inFile = fullfile(outMC,inVols{i});
+        outFile = fullfile(outMC,sprintf('tmp_%04d.nii.gz',i));
+        [~,~] = system(['mri_robust_register --mov ' inFile ...
+            ' --dst ' mcParams.dstFile ' --lta ' fullfile(outMC,sprintf('%04d.lta',i)) ...
+            ' --vox2vox --satit --mapmov ' outFile]);
+        progBar(i);
+    end
+else
+    % Motion correct and apply distortion correction
+    system(['flirt -dof 6 -interp spline -in ' mcParams.dstFile ' -ref ' ...
+        mcParams.phaseFile ' -omat ' fullfile(outMC,'dst2dc.mat')]);
+    for i = 1:length(inVols)
+        inFile = fullfile(outMC,inVols{i});
+        outFile = fullfile(outMC,sprintf('tmp_%04d.nii.gz',i));
+        % Calculate motion
+        [~,~] = system(['mri_robust_register --mov ' inFile ...
+            ' --dst ' mcParams.dstFile ' --lta ' fullfile(outMC,sprintf('%04d.lta',i)) ...
+            ' --vox2vox --satit']);
+        % Convert to FSL style matrix
+        system(['tkregister2 --mov ' inFile ' --targ ' mcParams.dstFile ' --check-reg ' ...
+            '--lta ' fullfile(outMC,sprintf('%04d.lta',i)) ' --fslregout ' ...
+            fullfile(outMC,sprintf('%04d.mat',i)) ' --noedit']);
+        % Combine motion correction and registration to fieldmap
+        system(['convert_xfm -omat ' fullfile(outMC,sprintf('mcdc%04d.mat',i)) ...
+            ' -concat ' fullfile(outMC,sprintf('%04d.mat',i)) ...
+            ' ' fullfile(outMC,'dst2dc.mat')]);
+        % Combine affine registrations and warp
+        system(['convertwarp --relout --rel -r ' mcParams.phaseFile ' --premat=' ...
+            fullfile(outMC,sprintf('mcdc%04d.mat',i)) ' --warp1=' mcParams.warpFile ...
+            ' --out=' fullfile(outMC,sprintf('warpField%04d.nii.gz',i))]);
+        % Apply warp
+        system(['applywarp --rel --interp=spline -i ' inFile ' -r ' inFile ...
+            ' -w ' fullfile(outMC,sprintf('warpField%04d.nii.gz',i)) ' -o ' ...
+            outFile]);
+        progBar(i);
+    end
 end
-system(['rm ' fullfile(outMC,'split_f0*')]); % remove split volumes
 %% Merge into output 4D volume
-commandc = ['fslmerge -t ' outVol];
+commandc = ['fslmerge -t ' mcParams.outFile];
 for i = 1:length(inVols)
     outFile = fullfile(outMC,sprintf('tmp_%04d.nii.gz',i));
     commandc = [commandc ' ' outFile];
 end
 system(commandc);
-system(['rm ' fullfile(outMC,'tmp_*nii.gz')]); % remove tmp volumes
 %% Convert .lta files to translations and rotations
 clear x y z pitch yaw roll
 ltaFiles = listdir(fullfile(outMC,'*.lta'),'files');
@@ -61,3 +91,6 @@ for i = 1:length(ltaFiles);
 end
 motion_params = [pitch',yaw',roll',x',y',z'];
 dlmwrite(fullfile(outMC,'motion_params.txt'),motion_params,'delimiter',' ','precision','%10.5f');
+%% Clean up
+system(['rm ' fullfile(outMC,'*.mat')]); % remove .mat volumes
+system(['rm ' fullfile(outMC,'*.nii.gz')]); % remove nifti volumes

@@ -13,7 +13,9 @@ function create_preprocessing_scripts(params)
 %   params.jobName          = job name (typically subjectName)
 %   params.numRuns          = number of functional runs
 %   params.reconall         = run FreeSurfer's reconall (default = 0)
+%   params.despike          = remove large spikes from fMRI data 
 %   params.slicetiming      = correct slice timings (default = 1)
+%   params.topup            = perform 'topup' distortion correction
 %   params.refvol           = reference volume number for motion correction (default = 1)
 %   params.regFirst         = register all runs to first bold run (default = 1)
 %   params.filtType         = type of temporal filter (default = 'high')
@@ -28,26 +30,28 @@ function create_preprocessing_scripts(params)
 %   params.fmem             = memory for functional scripts (default = 50)
 %
 %   Example:
-%   params.sessionDir = '/data/jet/abock/data/Network_Connectivity/ASB/11042015';
-%   params.subjectName = 'A101415B'; 
-%   params.outDir = fullfile(params.sessionDir,'preprocessing_scripts');
-%   params.logDir = '/data/jet/abock/LOGS';
-%   params.jobName = params.subjectName;
-%   params.numRuns = 22; % number of bold runs
-%   params.reconall = 0;
-%   params.slicetiming = 1; 
-%   params.refvol = 1; 
-%   params.regFirst = 1;
-%   params.filtType = 'high';
-%   params.lowHz = 0.01;
-%   params.highHz = 0.10;
-%   params.physio = 1;
-%   params.motion = 1;
-%   params.task = 0;
-%   params.localWM = 1;
-%   params.anat = 1;
-%   params.amem = 20;
-%   params.fmem = 50;
+%   params.sessionDir       = '/data/jet/abock/data/Network_Connectivity/ASB/11042015';
+%   params.subjectName      = 'A101415B'; 
+%   params.outDir           = fullfile(params.sessionDir,'preprocessing_scripts');
+%   params.logDir           = '/data/jet/abock/LOGS';
+%   params.jobName          = params.subjectName;
+%   params.numRuns          = 10; % number of bold runs
+%   params.reconall         = 0;
+%   params.despike          = 1;
+%   params.slicetiming      = 1; 
+%   params.topup            = 1;
+%   params.refvol           = 1; 
+%   params.regFirst         = 1;
+%   params.filtType         = 'high';
+%   params.lowHz            = 0.01;
+%   params.highHz           = 0.10;
+%   params.physio           = 1;
+%   params.motion           = 1;
+%   params.task             = 0;
+%   params.localWM          = 1;
+%   params.anat             = 1;
+%   params.amem             = 20;
+%   params.fmem             = 50;
 %   create_preprocessing_scripts(params);
 %
 %   Written by Andrew S Bock Aug 2015
@@ -58,6 +62,9 @@ if ~isfield(params,'reconall')
 end
 if ~isfield(params,'slicetiming')
     params.slicetiming = 1;
+end
+if ~isfield(params,'topup')
+    params.topup = 1;
 end
 if ~isfield(params,'refvol')
     params.refvol = 1;
