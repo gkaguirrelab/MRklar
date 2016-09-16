@@ -12,22 +12,22 @@ function create_preprocessing_scripts(params)
 %   params.logDir           = full path to log file directory
 %   params.jobName          = job name (typically subjectName)
 %   params.numRuns          = number of functional runs
-%   params.reconall         = run FreeSurfer's reconall (default = 0)
-%   params.despike          = remove large spikes from fMRI data 
-%   params.slicetiming      = correct slice timings (default = 1)
-%   params.topup            = perform 'topup' distortion correction
-%   params.refvol           = reference volume number for motion correction (default = 1)
-%   params.regFirst         = register all runs to first bold run (default = 1)
-%   params.filtType         = type of temporal filter (default = 'high')
-%   params.lowHz            = only used in 'high' or 'band' temporal filters
-%   params.highHz           = only used in 'low or 'band' temporal filters
-%   params.physio           = physiological noise removal using pulse ox (default = 0)
-%   params.motion           = noise removal using head motion (default = 1)
-%   params.task             = orthogonalization to task regressors (default = 0)
-%   params.localWM          = removal of noise derived from local white matter (default = 1)
-%   params.anat             = removal of noise derived from anatomical ROIs (default = 1)
-%   params.amem             = memory for anatomical scripts (default = 20)
-%   params.fmem             = memory for functional scripts (default = 50)
+%   params.reconall         = run FreeSurfer's reconall                         (default = 0)
+%   params.despike          = remove large spikes from fMRI data                (default = 1)
+%   params.slicetiming      = correct slice timings                             (default = 1)
+%   params.topup            = perform 'topup' distortion correction             (default = 0)
+%   params.refvol           = reference volume number for motion correction     (default = 1)
+%   params.regFirst         = register all runs to first bold run               (default = 1)
+%   params.filtType         = type of temporal filter                           (default = 'high')
+%   params.lowHz            = only used in 'high' or 'band' temporal filters    (default = 0.01) 
+%   params.highHz           = only used in 'low or 'band' temporal filters      (default = 0.1) 
+%   params.physio           = physiological noise removal using pulse ox        (default = 0)
+%   params.motion           = noise removal using head motion                   (default = 1)
+%   params.task             = orthogonalization to task regressors              (default = 0)
+%   params.localWM          = removal of noise derived from local white matter  (default = 1)
+%   params.anat             = removal of noise derived from anatomical ROIs     (default = 1)
+%   params.amem             = memory for anatomical scripts                     (default = 20)
+%   params.fmem             = memory for functional scripts                     (default = 50)
 %
 %   Example:
 %   params.sessionDir       = '/data/jet/abock/data/Network_Connectivity/ASB/11042015';
@@ -60,11 +60,14 @@ function create_preprocessing_scripts(params)
 if ~isfield(params,'reconall')
     params.reconall = 0;
 end
+if ~isfield(params,'despike')
+    params.despike = 1;
+end
 if ~isfield(params,'slicetiming')
     params.slicetiming = 1;
 end
 if ~isfield(params,'topup')
-    params.topup = 1;
+    params.topup = 0;
 end
 if ~isfield(params,'refvol')
     params.refvol = 1;
@@ -100,7 +103,7 @@ if ~isfield(params,'amem')
     params.amem = 20;
 end
 if ~isfield(params,'fmem')
-    params.fmem = 20;
+    params.fmem = 50;
 end
 %% Add to log
 diary ON;
