@@ -1,10 +1,10 @@
-function topup(params,tParams)
+function topup(sessionDir,tParams)
 
 % Calls FSL's 'topup' command, creates the necessary inputs to apply
 % distortion correction to a 4D fMRI volume
 %
 %   Usage:
-%       topup(params);
+%       topup(sessionDir,tParams);
 %
 %   Defaults:
 %       tParams.PhaseOne        = fullfile(params.sessionDir,'SpinEchoFieldMap',...
@@ -26,18 +26,18 @@ function topup(params,tParams)
 
 %% set defaults
 if ~exist('tParams','var')
-    tParams                 = []; 
+    tParams                 = [];
 end
 if ~isfield(tParams,'PhaseOne')
-    tParams.PhaseOne        = fullfile(params.sessionDir,'SpinEchoFieldMap',...
+    tParams.PhaseOne        = fullfile(sessionDir,'SpinEchoFieldMap',...
         'SpinEchoFieldMap_AP_01.nii.gz');
 end
 if ~isfield(tParams,'PhaseTwo')
-    tParams.PhaseTwo        = fullfile(params.sessionDir,'SpinEchoFieldMap',...
+    tParams.PhaseTwo        = fullfile(sessionDir,'SpinEchoFieldMap',...
         'SpinEchoFieldMap_PA_01.nii.gz');
 end
 if ~isfield(tParams,'outDir')
-    tParams.outDir          = fullfile(params.sessionDir,'SpinEchoFieldMap');
+    tParams.outDir          = fullfile(sessionDir,'SpinEchoFieldMap');
 end
 if ~isfield(tParams,'dwellTime')
     tParams.dwellTime       = 0.00058;

@@ -43,10 +43,6 @@ if params.slicetiming
     timingFile              = fullfile(params.sessionDir,d{runNum},'slicetiming');
     slice_timing_correction(inFile,outFile,timingFile);
 end
-%% Topup
-if isfield(params,'topup') && params.topup
-    topup(params);
-end
 %% Run motion correction
 if params.slicetiming
     mcParams.mcFile           = fullfile(params.sessionDir,d{runNum},'f.nii.gz');
