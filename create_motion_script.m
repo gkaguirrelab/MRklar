@@ -26,4 +26,5 @@ for rr = 1:params.numRuns
         'params.topup=' num2str(params.topup) ';' ...
         'motion_slice_correction(params,' num2str(rr) ');"']);
     fprintf(fid,['matlab -nodisplay -nosplash -r ' matlab_string]);
+    fclose(fid);
 end
