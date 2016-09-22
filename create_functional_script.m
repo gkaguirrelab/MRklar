@@ -42,6 +42,6 @@ for rr = 1:params.numRuns
             num2str(params.lowHz) ',' num2str(params.highHz) ');' ...
             'smooth_vol_surf(''$SESS'',$runNum,5,''d' func '.tf'');'];
     end
+    fprintf(fid,['matlab -nodisplay -nosplash -r ' matlab_string '"']);
+    fclose(fid);
 end
-fprintf(fid,['matlab -nodisplay -nosplash -r ' matlab_string '"']);
-fclose(fid);
