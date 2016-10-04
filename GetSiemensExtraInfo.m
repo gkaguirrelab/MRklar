@@ -91,6 +91,11 @@ if ~isempty(strfind(dcmhdr.tProtocolName,'bold')) || ~isempty(strfind(dcmhdr.tPr
     startidx    = strfind(Achar, 'MosaicRefAcqTimes');
     endidx      = strfind(Achar, 'AutoInlineImageFilterEnabled');
     remain      = Achar((startidx(1) + 17):(endidx-1)); % 17 = length of 'MosaicRefAcqTimes'
+    % Remove anything between 'MosaicRefAcqTimes' first 'M'
+    startidx    = strfind(remain,'FD');
+    if ~isempty(startidx)
+        remain      = remain(startidx(1):end);
+    end
     % Remove any numbers before first 'M'
     startidx    = strfind(remain,'M');
     remain      = remain(startidx(1):end);
