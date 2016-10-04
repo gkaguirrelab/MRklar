@@ -13,6 +13,10 @@ function motion_slice_correction(params,runNum)
 %       params.slicetiming      = 1; % do slice timing correction
 %       params.refvol           = 1; % reference volume = 1st TR
 %
+%   Optional:
+%       params.regFirst         = 1; % register to the first run
+%       params.topup            = 1; % use FSL's topup for distortion correction
+%
 %   Written by Andrew S Bock June 2016
 
 %% Set default parameters
@@ -58,7 +62,7 @@ mcParams.outFile                = fullfile(params.sessionDir,d{runNum},'rf.nii.g
 mcParams.outDir                 = fullfile(params.sessionDir,d{runNum});
 if isfield(params,'regFirst') && params.regFirst
     mcParams.dstFile            = fullfile(params.sessionDir,d{runNum},'dstFile.nii.gz');
-    system(['fslroi ' mcParams.regFile ' ' mcParams.dstFile ' 0 1']);
+    system(['fslroi ' mcParams.regFile ' ' mcParams.dstFile ' ' num2str(params.refvol-1) ' 1']);
 end
 if isfield(params,'topup') && params.topup
     if ~isempty(strfind(d{runNum},'_AP'))
