@@ -1,4 +1,4 @@
-function pulse = read_PULS_log_file(pulsFile)
+function pulse = read_PULS_log_file(pulsFile,dicom)
 
 % Reads in pulse file, outputs a structure with the following information:
 %
@@ -21,10 +21,10 @@ function pulse = read_PULS_log_file(pulsFile)
 %% Load the file, read the character information
 fid = fopen(pulsFile);
 InputText=textscan(fid,'%s',Inf,'delimiter','\n','HeaderLines',8);
-Nvalues = length(InputText{1});
-pulse.data = zeros(Nvalues,1);
-pulse.AT_ms = zeros(Nvalues,1);
-IsTrigger = zeros(Nvalues,1);
+Nvalues         = length(InputText{1});
+pulse.data      = zeros(Nvalues,1);
+pulse.AT_ms     = zeros(Nvalues,1);
+isTrigger       = zeros(Nvalues,1);
 for i = 1:Nvalues
     % a = converted data
     % b = number of elements
@@ -32,13 +32,19 @@ for i = 1:Nvalues
     if (b==3)
         pulse.data(i) = a(end);
         pulse.AT_ms(i) = 2.5*a(1); % multiply by 2.5ms 'tics'
-        IsTrigger(i) = 0;
+        isTrigger(i) = 0;
     elseif (b==4)
         pulse.data(i) = a(end - length('PULS_TRIGGER'));
-        IsTrigger(i) = 1;
+        isTrigger(i) = 1;
     end
 end
-pulse.peaks = pulse.AT_ms(IsTrigger==1);
+%% Pull out the values during the dicom acquistion
+[~,ind(1)]      = min(abs(dicom.AT(1) - pulse.AT_ms));
+[~,ind(2)]      = min(abs(dicom.AT(end) - pulse.AT_ms));
+pulse.data      = pulse.data(ind(1):ind(2));
+pulse.AT_ms     = pulse.AT_ms(ind(1):ind(2));
+isTrigger       = isTrigger(ind(1):ind(2));
+pulse.peaks     = pulse.AT_ms(isTrigger==1);
 %% Save final structure values
 if isempty(pulse.data)
     pulse.data_dmean = [];
