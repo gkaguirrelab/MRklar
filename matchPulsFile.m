@@ -53,7 +53,7 @@ for f=1:numPulsFiles
     [~,~,ext] = fileparts(pulsFile);
     switch ext
         case '.log'
-            pulse = read_PULS_log_file(pulsFile);
+            pulse = read_PULS_log_file(pulsFile,dicom);
         case '.puls'
             pulse = read_PMU_file(pulsFile);
     end

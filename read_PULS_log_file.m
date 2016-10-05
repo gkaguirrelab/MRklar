@@ -14,7 +14,7 @@ function pulse = read_PULS_log_file(pulsFile,dicom)
 %   pulse.bpm               - heart rate (beats per minute)
 %
 %   Usage:
-%   pulse = read_PULS_log_file(pulsFile);
+%   pulse = read_PULS_log_file(pulsFile,dicom)
 %
 %   Written by Andrew S Bock and Marta Vidorreta Díaz de Cerio Dec 2015
 
