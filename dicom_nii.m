@@ -24,10 +24,10 @@ fprintf(['Output ' fullfile(outDir,outFile) '\n']);
 dicomList = listdir(dicomDir,'files');
 %% Choose function to convert dicoms to nifti
 if useMRIcron
-    system(['dcm2nii -d n -p n -o ' dicomDir ' ' dicomDir]);
+    system(['dcm2nii -d n -p n -o ' outDir ' ' dicomDir]);
     created_file = listdir(fullfile(dicomDir,'s0*.nii.gz'),'files');
     if ~isempty(created_file)
-        movefile(fullfile(dicomDir,created_file{1}),fullfile(outDir,outFile));
+        movefile(fullfile(outDir,created_file{1}),fullfile(outDir,outFile));
     else
         disp('dcm2nii failed to convert');
     end

@@ -13,7 +13,7 @@ function [EchoSpacing,EPI_TE] = echo_spacing(dcmDir,outDir)
 repo_path = which('echo_spacing');
 repo_path = fileparts(repo_path);
 %% Get Dicoms
-dicomlist = listdir(dcmDir,'files');
+dicomlist = listdir(fullfile(dcmDir,'*.dcm'),'files');
 result = GetSiemensExtraInfo(fullfile(dcmDir,dicomlist{end}),fullfile(repo_path,'Mydicom-dict.txt'));
 %% Find acceleration factor
 AF = result.AF;
