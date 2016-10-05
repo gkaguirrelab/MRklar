@@ -39,12 +39,14 @@ for i = 1:Nvalues
     end
 end
 %% Pull out the values during the dicom acquistion
-[~,ind(1)]      = min(abs(dicom.AT(1) - pulse.AT_ms));
-[~,ind(2)]      = min(abs(dicom.AT(end) - pulse.AT_ms));
-pulse.data      = pulse.data(ind(1):ind(2));
-pulse.AT_ms     = pulse.AT_ms(ind(1):ind(2));
-isTrigger       = isTrigger(ind(1):ind(2));
-pulse.peaks     = pulse.AT_ms(isTrigger==1);
+if ~isempty(pulse.data)
+    [~,ind(1)]      = min(abs(dicom.AT(1) - pulse.AT_ms));
+    [~,ind(2)]      = min(abs(dicom.AT(end) - pulse.AT_ms));
+    pulse.data      = pulse.data(ind(1):ind(2));
+    pulse.AT_ms     = pulse.AT_ms(ind(1):ind(2));
+    isTrigger       = isTrigger(ind(1):ind(2));
+    pulse.peaks     = pulse.AT_ms(isTrigger==1);
+end
 %% Save final structure values
 if isempty(pulse.data)
     pulse.data_dmean = [];
