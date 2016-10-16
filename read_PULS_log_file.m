@@ -44,7 +44,7 @@ end
 %% Pull out the values during the dicom acquistion
 if ~isempty(pulse.data)
     [~,ind(1)]      = min(abs(dicom.AT(1) - pulse.AT_ms));
-    [~,ind(2)]      = min(abs(dicom.AT(end) - pulse.AT_ms));
+    [~,ind(2)]      = min(abs((dicom.AT(end) + dicom.TR_all(end)) - pulse.AT_ms));
     pulse.data      = pulse.data(ind(1):ind(2));
     pulse.AT_ms     = pulse.AT_ms(ind(1):ind(2));
     isTrigger       = isTrigger(ind(1):ind(2));
