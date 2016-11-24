@@ -1,9 +1,9 @@
-function [x,y,z,pitch,yaw,roll] = convertMAT2tranrot(MATFile)
+function [pitch,yaw,roll,x,y,z] = convertMAT2tranrot(MATFile)
 
 % Converts a FSL MAT motion file to translation and rotation values
 %
 %   Usage:
-%   [x,y,z,pitch,yaw,roll] = convertlta2tranrot(ltaMat)
+%   [pitch,yaw,roll,x,y,z] = convertMAT2tranrot(MATFile)
 %
 %   Written by Andrew S Bock Apr 2016
 

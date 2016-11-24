@@ -61,10 +61,14 @@ end
 mcParams.outFile                = fullfile(params.sessionDir,d{runNum},'rf.nii.gz');
 mcParams.outDir                 = fullfile(params.sessionDir,d{runNum});
 if isfield(params,'regFirst') && params.regFirst
+    % Copy the first volume of the first run to d{runNum}
     mcParams.dstFile            = fullfile(params.sessionDir,d{runNum},'dstFile.nii.gz');
     system(['fslroi ' mcParams.regFile ' ' mcParams.dstFile ' ' num2str(params.refvol-1) ' 1']);
 end
+% output for registration file
+mcParams.dstMat             = fullfile(params.sessionDir,d{runNum},'dstMat.mat');
 if isfield(params,'topup') && params.topup
+    % motion correction file
     if ~isempty(strfind(d{runNum},'_AP'))
         mcParams.phaseFile      = fullfile(params.sessionDir,'SpinEchoFieldMap','SpinEchoFieldMap_AP_01.nii.gz');
         mcParams.warpFile       = fullfile(params.sessionDir,'SpinEchoFieldMap','PhaseOneWarp.nii.gz');
@@ -75,4 +79,4 @@ if isfield(params,'topup') && params.topup
         error('No warp direction found in bold directory name');
     end
 end
-mri_robust_register(params,mcParams);
+mcflirt(params,mcParams);
