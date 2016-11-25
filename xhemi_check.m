@@ -18,9 +18,6 @@ if ~exist('SUBJECTS_DIR','var')
     SUBJECTS_DIR = getenv('SUBJECTS_DIR');
 end
 anatdatadir = fullfile(SUBJECTS_DIR,subject_name);
-%% Add to log
-SaveLogInfo(session_dir,mfilename,session_dir,subject_name,SUBJECTS_DIR)
-
 %% Check for xhemireg and fsaverage_sym registration
 disp('Checking for xhemi and fsaverage_sym registration');
 if ~exist(fullfile(anatdatadir,'xhemi'),'dir')
