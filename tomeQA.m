@@ -14,6 +14,7 @@ function tomeQA(params)
 %       params.spinEcho         = 1; % view SpinEchoFieldMaps, set to 0 to skip
 %       params.rawBold          = 1; % view raw_f.nii.gz, set to 0 to skip
 %       params.processedBold    = 1; % view wdrf.tf.nii.gz, set to 0 to skip
+%       params.motion           = 1; % save motion plots, set to 0 to skip
 %
 %   Written by Andrew S Bock Nov 2016
 
@@ -31,6 +32,9 @@ end
 if ~isfield(params,'processedBold')
     params.processedBold    = 1;
 end
+if ~isfield(params,'motion')
+    params.motion           = 1;
+end
 if ~exist(params.outDir,'dir')
     mkdir(params.outDir);
 end
@@ -38,6 +42,7 @@ end
 if params.T1
     t1Vol                   = fullfile(params.sessionDir,'MPRAGE/001/MPRAGE.nii.gz');
     imshow3D(t1Vol);
+    title('T1','FontSize',20);
     savefigs('pdf',fullfile(params.outDir,'T1'));
     close all;
 end
@@ -90,5 +95,23 @@ if params.processedBold
         savefigs('pdf',fullfile(params.outDir,[b{i} '-wdrf.tf.pdf']));
         close all;
         system(['rm ' singleF]);
+    end
+end
+%% Save motion parameter plots
+if params.motion
+    b                       = find_bold(params.sessionDir);
+    for i = 1:length(b)
+        mp = load(fullfile(params.sessionDir,b{i},'mc/motion_params.txt'));
+        mp(:,1:3) = mp(:,1:3)*50;
+        figure;
+        plot(mp);
+        ylim([-1 1]);
+        title(b{i},'FontSize',20);
+        xlabel('TR','FontSize',20);
+        xlim([1 size(mp,1)]);
+        ylabel('Movement (mm)','FontSize',20);
+        legend({'pitch' 'yaw' 'roll' 'x' 'y' 'z'},'FontSize',10,'Location','EastOutside');
+        savefigs('pdf',fullfile(params.outDir,[b{i} '-motion.pdf']));
+        close all;
     end
 end
