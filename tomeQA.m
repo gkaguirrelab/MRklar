@@ -105,7 +105,7 @@ if params.motion
         mp(:,1:3) = mp(:,1:3)*50;
         figure;
         plot(mp);
-        ylim([-1 1]);
+        ylim([-2 2]);
         title(b{i},'FontSize',20);
         xlabel('TR','FontSize',20);
         xlim([1 size(mp,1)]);
