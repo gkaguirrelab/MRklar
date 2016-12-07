@@ -7,6 +7,9 @@ function create_preprocessing_scripts(params)
 %
 %   params field names:
 %   params.sessionDir       = full path to session directory
+%   params.dicomDir         = full path to dicom directory
+%   params.useMRIcron       = 1; if 0, uses FreeSurfer's 'mri_convert'
+%   params.isGE             = 0; if 1, does not read functions that assume a Siemens header (e.g. 'echo_spacing');
 %   params.subjectName      = freesurfer subject name
 %   params.outDir           = full path to script output directory
 %   params.logDir           = full path to log file directory
@@ -32,6 +35,9 @@ function create_preprocessing_scripts(params)
 %   Example:
 %   params.sessionDir       = '/data/jet/abock/data/Network_Connectivity/ASB/11042015';
 %   params.subjectName      = 'A101415B'; 
+%   params.dicomDir         = fullfile(params.sessionDir,'DICOMS');
+%   params.useMRIcron       = 1;
+%   params.isGE             = 0;
 %   params.outDir           = fullfile(params.sessionDir,'preprocessing_scripts');
 %   params.logDir           = '/data/jet/abock/LOGS';
 %   params.jobName          = params.subjectName;

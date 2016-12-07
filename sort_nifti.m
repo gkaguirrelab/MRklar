@@ -1,27 +1,35 @@
-function sort_nifti(session_dir,dicom_dir,useMRIcron)
+function sort_nifti(session_dir,dicom_dir,useMRIcron,isGE)
 
 %   Sorts dicoms into series directories, converts to nifti files based on
 %   series type (e.g. MPRAGE, BOLD, DTI). Also ACPC aligns anatomical
 %   images. Assumes dicoms are found in a "DICOMS" directory, in the
 %   session directory.
 %
-%   Usage: sort_nifti(session_dir,dicom_dir)
+%   Usage: 
+%       sort_nifti(session_dir,dicom_dir,useMRIcron,isGE)
 %
 %   note: for the ACPC step to work, you need to have python installed.
 %   Also, by default 'ACPC.m' uses an FSL anatomical atlas, so it is
 %   recommended that FSL also be installed.
 %
-%   Written by Andrew S Bock Feb 2014
+%   Inputs:
+%       session_dir         = '/path/to/sessionDir';
+%       dicom_dir           = '/path/to/sessionDir/DICOMS';
+%       useMRIcron          = 1; % if 0, uses 'mri_convert'
+%       isGE                = 0; % if 1, does not call 'echo_spacing' or
+%       'slice_timing' functions, which were written for Siemens data
 %
-% 12/15/14      spitschan       Output to be run in the shell also saved in
-%                               file.
+%   Written by Andrew S Bock Feb 2014
 
 %% Set default parameters
 if ~exist('dicom_dir','var')
-    dicom_dir = fullfile(session_dir,'DICOMS');
+    dicom_dir   = fullfile(session_dir,'DICOMS');
 end
 if ~exist('useMRIcron','var')
-    useMRIcron = 1; % use 'MRIcron'
+    useMRIcron  = 1; % use 'MRIcron'
+end
+if ~exist('isGE','var')
+   isGE         = 0; 
 end
 %% sort dicoms within this directory
 dicom_sort(dicom_dir);
@@ -99,8 +107,10 @@ if ~isempty(series)
             outputFile = 'raw_f.nii.gz';
             dicom_nii(fullfile(dicom_dir,series{s}),outputDir,outputFile,useMRIcron)
             system(['echo ' series{s} ' > ' fullfile(outputDir,'series_name')]);
-            echo_spacing(fullfile(dicom_dir,series{s}),outputDir);
-            slice_timing(fullfile(dicom_dir,series{s}),outputDir);
+            if ~isGE
+                echo_spacing(fullfile(dicom_dir,series{s}),outputDir);
+                slice_timing(fullfile(dicom_dir,series{s}),outputDir);
+            end
             disp('done.')
         elseif ~isempty(strfind(series{s},'SpinEchoFieldMap'))
             fprintf('\nPROCESSING FIELDMAP IMAGE\n');
