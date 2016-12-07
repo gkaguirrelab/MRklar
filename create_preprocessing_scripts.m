@@ -5,64 +5,75 @@ function create_preprocessing_scripts(params)
 %   Usage:
 %   create_preprocessing_scripts(params)
 %
-%   params field names:
-%   params.sessionDir       = full path to session directory
-%   params.dicomDir         = full path to dicom directory
-%   params.useMRIcron       = 1; if 0, uses FreeSurfer's 'mri_convert'
-%   params.isGE             = 0; if 1, does not read functions that assume a Siemens header (e.g. 'echo_spacing');
-%   params.subjectName      = freesurfer subject name
-%   params.outDir           = full path to script output directory
-%   params.logDir           = full path to log file directory
-%   params.jobName          = job name (typically subjectName)
-%   params.numRuns          = number of functional runs
-%   params.reconall         = run FreeSurfer's reconall                         (default = 0)
-%   params.despike          = remove large spikes from fMRI data                (default = 1)
-%   params.slicetiming      = correct slice timings                             (default = 1)
-%   params.topup            = perform 'topup' distortion correction             (default = 0)
-%   params.refvol           = reference volume number for motion correction     (default = 1)
-%   params.regFirst         = register all runs to first bold run               (default = 1)
-%   params.filtType         = type of temporal filter                           (default = 'high')
-%   params.lowHz            = only used in 'high' or 'band' temporal filters    (default = 0.01) 
-%   params.highHz           = only used in 'low or 'band' temporal filters      (default = 0.1) 
-%   params.physio           = physiological noise removal using pulse ox        (default = 0)
-%   params.motion           = noise removal using head motion                   (default = 1)
-%   params.task             = orthogonalization to task regressors              (default = 0)
-%   params.localWM          = removal of noise derived from local white matter  (default = 1)
-%   params.anat             = removal of noise derived from anatomical ROIs     (default = 1)
-%   params.amem             = memory for anatomical scripts                     (default = 20)
-%   params.fmem             = memory for functional scripts                     (default = 50)
+%   Required:
+%       params.sessionDir       = '/full/path/to/sessionDirectory';
+%       params.subjectName      = 'freesurferSubjectName';
+%       params.outDir           = '/full/path/to/script/outDirectory';
+%       params.logDir           = '/full/path/to/logDirectory';
+%       params.jobName          = 'jobName'; % typically subjectName
+%       params.numRuns          = number of bold runs;
+%
+%   Defaults:
+%       params.dicomDir         = fullfile(params.sessionDir,'DICOMS');
+%       params.useMRIcron       = 1;        % if 0, uses FreeSurfer's 'mri_convert'
+%       params.isGE             = 0;        % if 1, does not read functions that assume a Siemens header (e.g. 'echo_spacing');
+%       params.reconall         = 0;        % if 1, run FreeSurfer's reconall
+%       params.despike          = 1;        % remove large spikes from fMRI data
+%       params.slicetiming      = 1;        % correct slice timings
+%       params.topup            = 0;        % if 1, perform 'topup' distortion correction
+%       params.refvol           = 1;        % reference volume number for motion correction
+%       params.regFirst         = 1;        % register all runs to first bold run
+%       params.filtType         = 'high';   % type of temporal filter
+%       params.lowHz            = 0.01;     % only used in 'high' or 'band' temporal filters 
+%       params.highHz           = 0.10;     % only used in 'low or 'band' temporal filters
+%       params.physio           = 0;        % if 1, physiological noise removal using pulse ox
+%       params.motion           = 1;        % noise removal using head motion
+%       params.task             = 0;        % orthogonalization to task regressors
+%       params.localWM          = 1;        % removal of noise derived from local white matter 
+%       params.anat             = 1;        % removal of noise derived from anatomical ROIs  
+%       params.amem             = 20;       % memory for anatomical scripts
+%       params.fmem             = 50;       % memory for functional scripts
 %
 %   Example:
-%   params.sessionDir       = '/data/jet/abock/data/Network_Connectivity/ASB/11042015';
-%   params.subjectName      = 'A101415B'; 
-%   params.dicomDir         = fullfile(params.sessionDir,'DICOMS');
-%   params.useMRIcron       = 1;
-%   params.isGE             = 0;
-%   params.outDir           = fullfile(params.sessionDir,'preprocessing_scripts');
-%   params.logDir           = '/data/jet/abock/LOGS';
-%   params.jobName          = params.subjectName;
-%   params.numRuns          = 10; % number of bold runs
-%   params.reconall         = 0;
-%   params.despike          = 1;
-%   params.slicetiming      = 1; 
-%   params.topup            = 1;
-%   params.refvol           = 1; 
-%   params.regFirst         = 1;
-%   params.filtType         = 'high';
-%   params.lowHz            = 0.01;
-%   params.highHz           = 0.10;
-%   params.physio           = 1;
-%   params.motion           = 1;
-%   params.task             = 0;
-%   params.localWM          = 1;
-%   params.anat             = 1;
-%   params.amem             = 20;
-%   params.fmem             = 50;
+%       params.sessionDir       = '/data/jet/abock/data/Network_Connectivity/ASB/11042015';
+%       params.subjectName      = 'A101415B'; 
+%       params.outDir           = fullfile(params.sessionDir,'preprocessing_scripts');
+%       params.logDir           = '/data/jet/abock/LOGS';
+%       params.jobName          = params.subjectName;
+%       params.numRuns          = 10; % number of bold runs
+%       params.dicomDir         = fullfile(params.sessionDir,'DICOMS');
+%       params.useMRIcron       = 1;
+%       params.isGE             = 0;
+%       params.reconall         = 0;
+%       params.despike          = 1;
+%       params.slicetiming      = 1; 
+%       params.topup            = 1;
+%       params.refvol           = 1; 
+%       params.regFirst         = 1;
+%       params.filtType         = 'high';
+%       params.lowHz            = 0.01;
+%       params.highHz           = 0.10;
+%       params.physio           = 1;
+%       params.motion           = 1;
+%       params.task             = 0;
+%       params.localWM          = 1;
+%       params.anat             = 1;
+%       params.amem             = 20;
+%       params.fmem             = 50;
 %   create_preprocessing_scripts(params);
 %
 %   Written by Andrew S Bock Aug 2015
 
 %% Set defaults
+if ~isfield(params,'dicomDir')
+    params.dicomDir = fullfile(params.sessionDir,'DICOMS');
+end
+if ~isfield(params,'useMRIcron')
+    params.useMRIcron = 1;
+end
+if ~isfield(params,'isGE')
+    params.isGE = 0;
+end
 if ~isfield(params,'reconall')
     params.reconall = 0;
 end
