@@ -101,16 +101,23 @@ end
 if params.motion
     b                       = find_bold(params.sessionDir);
     for i = 1:length(b)
+        % Make figure
+        figure('units','normalized','position',[0 0 1 1]);
+        % plot data
         mp = load(fullfile(params.sessionDir,b{i},'mc/motion_params.txt'));
         mp(:,1:3) = mp(:,1:3)*50;
-        figure;
+        x = 1:size(mp,1);
         plot(mp);
-        ylim([-2 2]);
-        title(b{i},'FontSize',20);
-        xlabel('TR','FontSize',20);
+        hold on;
+        plot(x,-2 * ones(size(x)),'--k',x,2 * ones(size(x)),'--k');
+        ylim([-3 3]);
         xlim([1 size(mp,1)]);
+        title(b{i},'FontSize',20);
+        set(gca,'FontSize',15);
+        xlabel('TR','FontSize',20);
         ylabel('Movement (mm)','FontSize',20);
-        legend({'pitch' 'yaw' 'roll' 'x' 'y' 'z'},'FontSize',10,'Location','EastOutside');
+        grid on;
+        legend({'pitch' 'yaw' 'roll' 'x' 'y' 'z'},'FontSize',20,'Location','EastOutside');
         savefigs('pdf',fullfile(params.outDir,[b{i} '-motion.pdf']));
         close all;
     end
