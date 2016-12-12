@@ -63,7 +63,7 @@ for i = 1:length(b)
     postGM                  = postTC(gmInd,:);
     postWM                  = postTC(nongmInd,:);
     %% Plot the data
-    fullFigure;
+    figure('units','normalized','position',[0 0 1 1]);
     % Relative head motion
     subplot(8,1,1);
     plot(motion_noise);
