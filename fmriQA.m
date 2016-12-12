@@ -6,11 +6,25 @@ function fmriQA(params)
 %       params.sessionDir       = '/path/to/sessionDir'
 %       params.outDir           = '/full/path/to/outDir'
 %
+%   Defaults:
+%       params.preName          = 'rf.nii.gz'; % pre-denoising volume
+%       params.postName         = 'wdrf.tf.nii.gz'; % post-denoising volume
+%
+%   This function is based upon:
+%
+%       Power, J. D. (2016). A simple but useful way to assess fMRI scan
+%       qualities. NeuroImage.
+%       http://www.sciencedirect.com/science/article/pii/S1053811916303871
+%
 %   Written by Andrew S Bock Dec 2016
 
 %% Set defaults
-preName                 = 'rf.nii.gz';
-postName                = 'wdrf.tf.nii.gz';
+if ~isfield(params,'preName')
+    params.preName          = 'rf.nii.gz';
+end
+if ~isfield(params,'postName')
+    params.postName         = 'wdrf.tf.nii.gz';
+end
 %% Get bold runs
 b                       = find_bold(params.sessionDir);
 %% Loop through the bold runs
@@ -18,7 +32,7 @@ for i = 1:length(b)
     motion_noise            = load(fullfile(params.sessionDir,b{i},'rf.nii.gz_rel.rms'));
     motion_noise            = [0;motion_noise];
     physio_noise            = load(fullfile(params.sessionDir,b{i},'puls.mat'));
-    clear pulseIdx
+    pulseIdx                = nan(1,length(physio_noise.dicom.AT));
     for j = 1:length(physio_noise.dicom.AT)
         [~,pulseIdx(j)]     = min(abs(physio_noise.dicom.AT(j) - physio_noise.pulse.AT_ms));
     end
@@ -27,14 +41,14 @@ for i = 1:length(b)
     brain                   = load_nifti(fullfile(params.sessionDir,b{i},'func.brain.nii.gz'));
     gm                      = load_nifti(fullfile(params.sessionDir,b{i},'func.aseg.gm.nii.gz'));
     %% Load fMRI volumes
-    pre                     = load_nifti(fullfile(params.sessionDir,b{i},preName));
+    pre                     = load_nifti(fullfile(params.sessionDir,b{i},params.preName));
     preDims                 = size(pre.vol);
     preTC                   = reshape(pre.vol,preDims(1)*preDims(2)*preDims(3),preDims(4));
     preTC(brain.vol~=1,:)   = 0;
     meanPre                 = mean(preTC,2);
     preTC                   = detrend(preTC) + repmat(meanPre,1,size(preTC,2));
     preTC                   = convert_to_psc(preTC);
-    post                    = load_nifti(fullfile(params.sessionDir,b{i},postName));
+    post                    = load_nifti(fullfile(params.sessionDir,b{i},params.postName));
     postDims                = size(post.vol);
     postTC                  = reshape(post.vol,postDims(1)*postDims(2)*postDims(3),postDims(4));
     postTC(brain.vol~=1,:)  = 0;
