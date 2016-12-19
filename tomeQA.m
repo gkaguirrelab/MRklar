@@ -41,7 +41,7 @@ end
 %% View T1
 if params.T1
     t1Vol                   = fullfile(params.sessionDir,'MPRAGE/001/MPRAGE.nii.gz');
-    imshow3D(t1Vol);
+    imshow3D(t1Vol,[],1);
     title('T1','FontSize',20);
     savefigs('pdf',fullfile(params.outDir,'T1'));
     close all;
