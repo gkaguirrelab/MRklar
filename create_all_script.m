@@ -20,11 +20,11 @@ matlab_string = '"';
 %% Add anatomical scripts
 if params.reconall % If a new subject, for which recon-all has not been run
     fprintf(fid,['matlab -nodisplay -nosplash -r ' ...
-        '"sort_nifti(''$SESS'',''$dicomDir'',''$useMRIcron'',''$isGE'');"\n']);
+        '"sort_nifti(''$SESS'',''$dicomDir'',$useMRIcron,$isGE);"\n']);
     fprintf(fid,'recon-all -i $SESS/MPRAGE/001/ACPC/MPRAGE.ACPC.nii.gz -s $SUBJ -all\n');
 else
     matlab_string = [matlab_string ...
-        'sort_nifti(''$SESS'',''$dicomDir'',''$useMRIcron'',''$isGE'');'];
+        'sort_nifti(''$SESS'',''$dicomDir'',$useMRIcron,$isGE);'];
 end
 matlab_string = [matlab_string ...
     'skull_strip(''$SESS'',''$SUBJ'');' ...
