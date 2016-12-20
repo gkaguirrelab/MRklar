@@ -20,7 +20,11 @@ matlab_string = '"';
 if params.reconall % If a new subject, for which recon-all has not been run
     fprintf(fid,['matlab -nodisplay -nosplash -r ' ...
         '"sort_nifti(''$SESS'',''$dicomDir'',$useMRIcron,$isGE);"\n']);
-    fprintf(fid,'recon-all -i $SESS/MPRAGE/001/ACPC/MPRAGE.ACPC.nii.gz -s $SUBJ -all\n');
+    if params.isGE
+        fprintf(fid,'recon-all -i $SESS/MPRAGE/001/MPRAGE.nii.gz -s $SUBJ -all\n');
+    else
+        fprintf(fid,'recon-all -i $SESS/MPRAGE/001/ACPC/MPRAGE.ACPC.nii.gz -s $SUBJ -all\n');
+    end
 else
     matlab_string = [matlab_string ...
         'sort_nifti(''$SESS'',''$dicomDir'',$useMRIcron,$isGE);'];
