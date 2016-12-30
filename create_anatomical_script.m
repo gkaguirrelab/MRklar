@@ -7,6 +7,9 @@ function create_anatomical_script(params)
 %
 %   Written by Andrew S Bock Nov 2015
 
+%% set defaults
+SUBJECTS_DIR = getenv('SUBJECTS_DIR');
+
 %% Create job script
 fname = fullfile(params.outDir,[params.jobName '_anatomical.sh']);
 fid = fopen(fname,'w');
