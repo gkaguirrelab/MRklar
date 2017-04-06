@@ -19,10 +19,10 @@ fprintf(fid,['SESS=' params.sessionDir '\n']);
 fprintf(fid,['SUBJ=' params.subjectName '\n\n']);
 matlab_string = '"';
 if params.reconall % If a new subject, for which recon-all has not been run
-    fprintf(fid,'matlab -nodisplay -nosplash -r "tbUse(''$TBCONFIG'');sort_nifti(''$SESS'');"\n');
+    fprintf(fid,'matlab -nodisplay -nosplash -r "tbUseProject(''$TBCONFIG'');sort_nifti(''$SESS'');"\n');
     fprintf(fid,'recon-all -i $SESS/MPRAGE/001/ACPC/MPRAGE.ACPC.nii.gz -s $SUBJ -all\n');
 else
-    matlab_string = [matlab_string 'tbUse(''$TBCONFIG'');sort_nifti(''$SESS'');'];
+    matlab_string = [matlab_string 'tbUseProject(''$TBCONFIG'');sort_nifti(''$SESS'');'];
 end
 matlab_string = [matlab_string ...
     'skull_strip(''$SESS'',''$SUBJ'');' ...
