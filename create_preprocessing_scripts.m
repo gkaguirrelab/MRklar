@@ -2,10 +2,14 @@ function create_preprocessing_scripts(params)
 
 % Writes shell scripts to preprocess MRI data on the UPenn cluster.
 %
+%  MaxMelPaper update: call to ToolboxToolbox tbUse at the beginning of the
+%  script. Requires params.tbConfig (GF) 
+% 
 %   Usage:
 %   create_preprocessing_scripts(params)
 %
 %   params field names:
+%   params.tbConfig         = Name of ToolboxToolbox configuration file
 %   params.sessionDir       = full path to session directory
 %   params.subjectName      = freesurfer subject name
 %   params.outDir           = full path to script output directory

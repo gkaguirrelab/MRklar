@@ -1,7 +1,10 @@
 function create_all_script(params)
 
 % Writes shell scripts to preprocess anatomical and functional MRI data
-%
+% 
+%  MaxMelPaper update: call to ToolboxToolbox tbUse at the beginning of the
+%  script. Requires params.tbConfig (GF) 
+% 
 %   Usage:
 %   create_all_script(params)
 %
@@ -11,15 +14,16 @@ function create_all_script(params)
 fname = fullfile(params.outDir,[params.jobName '_all.sh']);
 fid = fopen(fname,'w');
 fprintf(fid,'#!/bin/bash\n');
+fprintf(fid,['TBCONFIG=' params.tbConfig '\n\n']);
 fprintf(fid,['SESS=' params.sessionDir '\n']);
 fprintf(fid,['SUBJ=' params.subjectName '\n\n']);
 matlab_string = '"';
 %% Add anatomical scripts
 if params.reconall % If a new subject, for which recon-all has not been run
-    fprintf(fid,'matlab -nodisplay -nosplash -r "sort_nifti(''$SESS'');"\n');
+    fprintf(fid,'matlab -nodisplay -nosplash -r "tbUse(''$TBCONFIG'');(sort_nifti(''$SESS'');"\n');
     fprintf(fid,'recon-all -i $SESS/MPRAGE/001/ACPC/MPRAGE.ACPC.nii.gz -s $SUBJ -all\n');
 else
-    matlab_string = [matlab_string 'sort_nifti(''$SESS'');'];
+    matlab_string = [matlab_string 'tbUse(''$TBCONFIG'');sort_nifti(''$SESS'');'];
 end
 matlab_string = [matlab_string ...
     'skull_strip(''$SESS'',''$SUBJ'');' ...

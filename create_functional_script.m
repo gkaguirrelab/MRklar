@@ -1,7 +1,9 @@
 function create_functional_script(params)
 
 % Writes shell script to preprocess functional MRI data
-%
+%  MaxMelPaper update: call to ToolboxToolbox tbUse at the beginning of the
+%  script. Requires params.tbConfig (GF) 
+% 
 %   Usage:
 %   create_functional_script(params)
 %
@@ -17,12 +19,13 @@ for rr = 1:params.numRuns
     fname = fullfile(params.outDir,[params.jobName '_functional_' runtext '.sh']);
     fid = fopen(fname,'w');
     fprintf(fid,'#!/bin/bash\n');
+    fprintf(fid,['TBCONFIG=' params.tbConfig '\n\n']);
     fprintf(fid,['SESS=' params.sessionDir '\n']);
     fprintf(fid,['SUBJ=' params.subjectName '\n\n']);
     fprintf(fid,['runNum=' num2str(rr) '\n\n']);
     func = 'rf';
     matlab_string = [...
-        '"register_func(''$SESS'',''$SUBJ'',$runNum,1,''' func ''');' ...
+        '"tbUse(''$TBCONFIG'');register_func(''$SESS'',''$SUBJ'',$runNum,1,''' func ''');' ...
         'project_anat2func(''$SESS'',$runNum,''' func ''');' ...
         'create_regressors(''$SESS'',$runNum,''' func ''',''detrend'',' ...
         num2str(params.lowHz) ',' num2str(params.highHz) ',' num2str(params.physio) ',' ...
