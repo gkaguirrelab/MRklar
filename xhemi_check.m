@@ -19,7 +19,7 @@ if ~exist('SUBJECTS_DIR','var')
 end
 anatdatadir = fullfile(SUBJECTS_DIR,subject_name);
 %% Add to log
-SaveLogInfo(session_dir,mfilename,session_dir,subject_name,SUBJECTS_DIR)
+% SaveLogInfo(session_dir,mfilename,session_dir,subject_name,SUBJECTS_DIR)
 
 %% Check for xhemireg and fsaverage_sym registration
 disp('Checking for xhemi and fsaverage_sym registration');
