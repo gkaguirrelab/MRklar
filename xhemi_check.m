@@ -19,8 +19,16 @@ if ~exist('SUBJECTS_DIR','var')
 end
 anatdatadir = fullfile(SUBJECTS_DIR,subject_name);
 %% Add to log
-% SaveLogInfo(session_dir,mfilename,session_dir,subject_name,SUBJECTS_DIR)
-
+% this does not always work on the cluster. Wrapping it into a try/catch so
+% that the preproccessing job does not break
+try
+    SaveLogInfo(session_dir,mfilename,session_dir,subject_name,SUBJECTS_DIR)
+catch ME
+end
+if exist('ME', 'var')
+    disp ('Error saving git Info. Continuing with the analysis.')
+    clear ME
+end
 %% Check for xhemireg and fsaverage_sym registration
 disp('Checking for xhemi and fsaverage_sym registration');
 if ~exist(fullfile(anatdatadir,'xhemi'),'dir')
