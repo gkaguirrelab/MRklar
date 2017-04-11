@@ -109,8 +109,7 @@ end
 if ~isfield(params,'fmem')
     params.fmem = 50;
 end
-%% Add to log
-diary ON;
+%% Add to log diary
 logFile = fullfile(params.sessionDir,'LOG');
 diary(logFile);
 disp('create_preprocessing_scripts');
