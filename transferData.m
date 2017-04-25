@@ -19,7 +19,7 @@ function transferData(params)
 %       params.dbDir           = '/Users/abock/Dropbox-Aguirre-Brainard-Lab';
 %       params.dbSess          = 'session2_spatialStimuli';
 %       params.dbSubject       = 'TOME_3003';
-%       params.dbDate          = '090216';
+%       params.dbDate          = '091616';
 %
 %   Written by Andrew S Bock Sep 2016
 
@@ -40,10 +40,10 @@ params.outDicom             = fullfile(params.sessionDir,'DICOMS');
 params.outPulse             = fullfile(params.sessionDir,'PulseOx');
 params.outProtocols         = fullfile(params.sessionDir,'Protocols');
 params.outStimuli           = fullfile(params.sessionDir,'Stimuli');
-params.dbScannerFiles       = fullfile(params.dbDir,params.dbSess,params.dbSubject,params.dbDate,'ScannerFiles');
+params.dbScannerFiles       = fullfile(params.dbDir,'TOME_data',params.dbSess,params.dbSubject,params.dbDate,'ScannerFiles');
 params.dbPulseOx            = fullfile(params.dbScannerFiles,'PulseOx');
 params.dbProtocols          = fullfile(params.dbScannerFiles,'Protocols');
-params.dbStimuli            = fullfile(params.dbDir,params.dbSess,params.dbSubject,params.dbDate,'Stimuli');
+params.dbStimuli            = fullfile(params.dbDir,'TOME_data',params.dbSess,params.dbSubject,params.dbDate,'Stimuli');
 %% Make directories
 mkdir(params.outDicom);
 mkdir(params.outPulse);
