@@ -10,7 +10,7 @@ function [EchoSpacing,EPI_TE] = echo_spacing(dcmDir,outDir)
 %   Written by Andrew S Bock Feb 2014
 
 %% Get path of repository
-repo_path = which('echo_spacing');
+repo_path = which('GetSiemensExtraInfo');
 repo_path = fileparts(repo_path);
 %% Get Dicoms
 dicomlist = listdir(fullfile(dcmDir,'*.dcm'),'files');

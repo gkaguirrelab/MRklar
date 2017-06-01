@@ -45,7 +45,7 @@ tmp_fmapfiltfile = fullfile(outputDir,'tmp_fmapfilt.nii.gz');
 tmp_eromaskfile = fullfile(outputDir,'tmp_eromask.nii.gz');
 tmp_edgemaskfile = fullfile(outputDir,'tmp_edgemask.nii.gz');
 tmp_fmapfiltedgefile = fullfile(outputDir,'tmp_fmapfiltedge.nii.gz');
-repo_path = which('B0calc');
+repo_path = which('GetSiemensExtraInfo');
 repo_path = fileparts(repo_path);
 %% Determine type of B0 sequence
 phaselist = listdir(phaseDicomDir,'files');

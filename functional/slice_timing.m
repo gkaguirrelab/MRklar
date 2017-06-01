@@ -8,7 +8,7 @@ function slice_timing(dcmDir,outDir)
 %   Written by Andrew S Bock May 2014
 
 %% Get repository directory
-repo_path = which('slice_timing');
+repo_path = which('GetSiemensExtraInfo');
 repo_path = fileparts(repo_path);
 %% Get Dicoms
 dicomlist = listdir(dcmDir,'files');
