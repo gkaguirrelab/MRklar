@@ -6,7 +6,8 @@ function [trueMax, trueMin]=detpeaks(v,delta,showplot)
 %
 %   defaults:
 %   v = no default, must specify a vector
-%   delta = 30; % for heart rate, assumes 30 beats per minute
+%   delta = 120; % for heart rate, assumes 100 beats per minute at a 
+%   sampling period of 5ms. 
 %   showplot = 0; don't plot the max and min peaks on the vector
 %
 %   The delta values is based on the distance betwen peak indices. The
@@ -27,8 +28,8 @@ function [trueMax, trueMin]=detpeaks(v,delta,showplot)
 maxvals = [];
 minvals = [];
 v = v(:);
-if ~exist('delta','var')
-    delta = 30; % 100 beats / minute
+if ~exist('delta','var') || isnan(delta)
+    delta = 120; % 100 beats / minute 
 end
 if ~exist('showplot','var')
     showplot = 0; % don't plot

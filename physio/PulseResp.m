@@ -85,12 +85,15 @@ FWHM = 0.4*pulse.sampR; % % 400 ms FWHM; following Verstynen & Deshpande (2011)
 sig = FWHM/(2*(sqrt(2*log(2)))); % convert to sigma
 pulse.Lsignal = smooth_kernel(pulse.Lsignal,sig);
 %% Find the peaks
-[pulse.highMax,pulse.highMin] = detpeaks(pulse.Hsignal,pulse.delta);
+%IF WANT TO USE DELTA must be divided by sampling period (in msec)
+%[pulse.highMax,pulse.highMin] = detpeaks(pulse.Hsignal,pulse.delta./pulse.sampT);
+[pulse.highMax,pulse.highMin] = detpeaks(pulse.Hsignal);
 output.Hevents = zeros(size(pulse.Hsignal));
 if ~isempty(pulse.highMax)
     output.Hevents(pulse.highMax(:,1)) = 1;
 end
-[pulse.lowMax,pulse.lowMin] = detpeaks(pulse.Lsignal,pulse.delta);
+%[pulse.lowMax,pulse.lowMin] = detpeaks(pulse.Lsignal,pulse.delta./pulse.sampT);
+[pulse.lowMax,pulse.lowMin] = detpeaks(pulse.Lsignal);
 output.Levents = zeros(size(pulse.Lsignal));
 if ~isempty(pulse.lowMax)
     output.Levents(pulse.lowMax(:,1)) = 1;
