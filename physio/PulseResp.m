@@ -86,14 +86,18 @@ sig = FWHM/(2*(sqrt(2*log(2)))); % convert to sigma
 pulse.Lsignal = smooth_kernel(pulse.Lsignal,sig);
 %% Find the peaks
 %IF WANT TO USE DELTA must be divided by sampling period (in msec)
+delta.cardiac = 600./pulse.sampT; %sets max delta to reflect 100bpm
+delta.resp = 3000./pulse.sampT; %sets max delta to reflect 20 breaths/min
 %[pulse.highMax,pulse.highMin] = detpeaks(pulse.Hsignal,pulse.delta./pulse.sampT);
-[pulse.highMax,pulse.highMin] = detpeaks(pulse.Hsignal);
+%[pulse.highMax,pulse.highMin] = detpeaks(pulse.Hsignal);
+[pulse.highMax,pulse.highMin] = detpeaks(pulse.Hsignal,delta.cardiac);
 output.Hevents = zeros(size(pulse.Hsignal));
 if ~isempty(pulse.highMax)
     output.Hevents(pulse.highMax(:,1)) = 1;
 end
 %[pulse.lowMax,pulse.lowMin] = detpeaks(pulse.Lsignal,pulse.delta./pulse.sampT);
-[pulse.lowMax,pulse.lowMin] = detpeaks(pulse.Lsignal);
+%[pulse.lowMax,pulse.lowMin] = detpeaks(pulse.Lsignal);
+[pulse.lowMax,pulse.lowMin] = detpeaks(pulse.Lsignal,delta.resp);
 output.Levents = zeros(size(pulse.Lsignal));
 if ~isempty(pulse.lowMax)
     output.Levents(pulse.lowMax(:,1)) = 1;
