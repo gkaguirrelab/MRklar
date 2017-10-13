@@ -38,6 +38,10 @@ for i = 1:Nvalues
         isTrigger(i) = 0;
     elseif (b==4)
         pulse.data(i) = a(end - length('PULS_TRIGGER'));
+        pulse.AT_ms(i) = 2.5*a(1); % multiply by 2.5ms 'tics'
+        if pulse.AT_ms(i) > 86400000 % 24 hours = 24*60*60*1000
+            pulse.AT_ms(i) = pulse.AT_ms(i) - 86400000;
+        end
         isTrigger(i) = 1;
     end
 end
